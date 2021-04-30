@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 import sys
 import pygame_gui
 import Maps
@@ -23,22 +24,37 @@ def graphicsInitialisation():
         [1, 1, 1, 1, 1]
     ]  # the data for the map expressed as [row[tile]].
 
+    wall = pygame.image.load('wall.png').convert_alpha()  # load images
+    grass = pygame.image.load('grass.png').convert_alpha()
+
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     TILEHEIGHT_HALF = TILEHEIGHT / 2
     TILEWIDTH_HALF = TILEWIDTH / 2
 
-    wall = pygame.image.load('wall.png').convert_alpha()  # load images
-    grass = pygame.image.load('grass.png').convert_alpha()
+    for row_nb, row in enumerate(map_data):    #for every row of the map...
+        for col_nb, tile in enumerate(row):
+            if tile == 1:
+                tileImage = wall
+            else:
+                tileImage = grass
+            cart_x = row_nb * TILEWIDTH_HALF
+            cart_y = col_nb * TILEHEIGHT_HALF
+            iso_x = (cart_x - cart_y)
+            iso_y = (cart_x + cart_y)/2
+            centered_x = DISPLAYSURF.get_rect().centerx + iso_x
+            centered_y = DISPLAYSURF.get_rect().centery/2 + iso_y
+            DISPLAYSURF.blit(tileImage, (centered_x, centered_y)) #display the actual tile
 
 
 # rendert das Spiel
 def renderGame():
-    pass
+    pygame.display.flip()
+    FPSCLOCK.tick(30)
 
 
 # startet das Spiel
-class GameLogic(object):
+def gameLogic():
     pass
 
 
