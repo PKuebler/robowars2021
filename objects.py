@@ -2,7 +2,7 @@
 
 class Object:
 
-    def __init__(self, name, obtype, health, x, y, player=None, steps=0):
+    def __init__(self, name, obtype, health, x, y, player=0, steps=0):
         self.name = name
         self.obtype = obtype
         self.health = health

@@ -66,10 +66,12 @@ def startGame():
     #wenn host: karte generieren
     if host:
         #beide Kartenlayer
-        terrainMap, objectMap = initializeGame.initGame(MAPSIZE)
+        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
+        #Host ist Spieler 1
+        playerOne = True
         #sendMapsToServer(terrainMap, objectMap)
     else:
-        pass
+        playerOne = False
         #receiveMapsFromServer(terrainMap, objectMap)
 
     #Variablen zum Start
@@ -83,7 +85,7 @@ def startGame():
             #Spieler ist am Zug
             elif playerTurn:
                 #Aktion auswerten
-                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode)
+                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot)
                 if order != None:
                     pass
                     #sendOrderToServer(order)

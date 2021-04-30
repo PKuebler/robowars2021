@@ -5,8 +5,8 @@ from objects import *
 
 def initGame(SIZE):
     terrainMap = createTerrainMap(SIZE)
-    objectMap = createObjectMap(SIZE)
-    return terrainMap, objectMap
+    objectMap, pl1, pl2 = createObjectMap(SIZE)
+    return terrainMap, objectMap, pl1, pl2
 
 def createTerrainMap(SIZE):
     """list2d mit Terrain-Tiles initialisieren"""
@@ -35,5 +35,5 @@ def createObjectMap(SIZE):
         list2d.append(ylist)
     #start der 2 spieler
     list2d[4][1] = Object("Roboter von Spieler 1", "robot1", 10, 4, 1, 1, 2)
-    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 10, 4, 1, 1, 1)
-    return list2d
+    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 10, 4, 1, 2, 1)
+    return list2d, list2d[4][1], list2d[5][8]

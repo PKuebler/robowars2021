@@ -2,7 +2,7 @@
 
 import pygame
 
-def handleEvents(event, playerTurn, moveMode):
+def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot):
     #Mausklick auswerten
     if pygame.MOUSEBUTTONUP:
         pass
