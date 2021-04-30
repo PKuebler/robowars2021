@@ -50,7 +50,7 @@ def graphicsInitialisation():
 
 # rendert das Spiel
 def renderGame():
-    pygame.display.flip()
+    #pygame.display.flip()
     FPSCLOCK.tick(30)
 
 
@@ -61,12 +61,13 @@ def gameLogic():
 
 def startGame():
     gameWindowInitialisation()
-    graphicsInitialisation()
+    #graphicsInitialisation()
 
     #beide Kartenlayer
     terrainMap, objectMap = initializeGame.initGame(MAPSIZE)
     #Variablen zum Start
     playerTurn = True
+    moveMode = True
 
     # GameLoop
     while True:

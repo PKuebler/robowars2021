@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+from objects import *
 
 def initGame(SIZE):
     terrainMap = createTerrainMap(SIZE)
@@ -25,11 +26,15 @@ def createObjectMap(SIZE):
     for x in range(SIZE):
         ylist = []
         for y in range(SIZE):
-            #an dieser Stelle Zufallsgenerator fuer Karten
+            #an dieser Stelle Zufallsgenerator fuer Objekte (außer Spieler)=
             if random.randint(0,4) == 0:
-                tileinfo = {"type": "wall", "health": 10}
+                tileinfo = Object("wall", "wall", 5, x, y)
             else:
-                tileinfo = {"type": None}
+                tileinfo = None
             ylist.append(tileinfo)
         list2d.append(ylist)
+    #start der 2 spieler
+    print(list2d)
     return list2d
+
+initGame(10)
