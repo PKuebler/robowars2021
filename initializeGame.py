@@ -34,7 +34,6 @@ def createObjectMap(SIZE):
             ylist.append(tileinfo)
         list2d.append(ylist)
     #start der 2 spieler
-    print(list2d)
+    list2d[4][1] = Object("Roboter von Spieler 1", "robot1", 10, 4, 1, 1, 2)
+    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 10, 4, 1, 1, 1)
     return list2d
-
-initGame(10)

@@ -60,8 +60,18 @@ def startGame():
     gameWindowInitialisation()
     #graphicsInitialisation()
 
-    #beide Kartenlayer
-    terrainMap, objectMap = initializeGame.initGame(MAPSIZE)
+
+    #Host oder nicht?
+    host = True
+    #wenn host: karte generieren
+    if host:
+        #beide Kartenlayer
+        terrainMap, objectMap = initializeGame.initGame(MAPSIZE)
+        #sendMapsToServer(terrainMap, objectMap)
+    else:
+        pass
+        #receiveMapsFromServer(terrainMap, objectMap)
+
     #Variablen zum Start
     playerTurn = True
     moveMode = True
@@ -70,10 +80,22 @@ def startGame():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            #Spieler ist am Zug
             elif playerTurn:
                 #Aktion auswerten
-                gameLogic.handleEvents(event)
+                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode)
+                if order != None:
+                    pass
+                    #sendOrderToServer(order)
+                    playerTurn = False
+        #Spieler ist nicht am Zug: Warten auf Antwort
+        if not playerTurn:
+            #receiveOrderFromServer()
+            time.sleep(1)
+
+
         renderGame()
+
 
 
 # Press the green button in the gutter to run the script.

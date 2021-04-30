@@ -2,9 +2,12 @@
 
 import pygame
 
-def handleEvents(event):
+def handleEvents(event, playerTurn, moveMode):
     #Mausklick auswerten
     if pygame.MOUSEBUTTONUP:
         pass
+    #Tastatur auswerten
     elif pygame.KEYUP:
-        if moveMode
+        if moveMode:
+
+    return playerTurn, modeMode
