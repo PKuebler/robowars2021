@@ -4,10 +4,12 @@ import pygame
 
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot):
     #Mausklick auswerten
-    if pygame.MOUSEBUTTONUP:
+    if event.type == pygame.MOUSEBUTTONUP:
         pass
     #Tastatur auswerten
-    elif pygame.KEYUP:
+    elif event.type == pygame.KEYUP:
+        #bewegen
         if moveMode:
+            if event.key == K_UP:
 
-    return playerTurn, modeMode
+    return playerTurn, moveMode, None

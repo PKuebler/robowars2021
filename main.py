@@ -85,7 +85,7 @@ def startGame():
             #Spieler ist am Zug
             elif playerTurn:
                 #Aktion auswerten
-                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot)
+                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap)
                 if order != None:
                     pass
                     #sendOrderToServer(order)
@@ -96,7 +96,7 @@ def startGame():
             time.sleep(1)
 
 
-        renderGame()
+        #renderGame()
 
 
 
