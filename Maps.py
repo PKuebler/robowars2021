@@ -9,6 +9,7 @@ def createMap():
     for x in range(WIDTH):
         ylist = []
         for y in range(HEIGHT):
+            #an dieser Stelle Zufallsgenerator fuer Karten
             tileinfo = {"type": "grass"}
             ylist.append(tileinfo)
         list2d.append(ylist)
