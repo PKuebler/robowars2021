@@ -3,9 +3,10 @@
 WIDTH = 10
 HEIGHT = 10
 
+
 def createMap():
     """list2d mit Tiles initialisieren"""
-    list2d=[]
+    list2d = []
     for x in range(WIDTH):
         ylist = []
         for y in range(HEIGHT):
