@@ -2,13 +2,17 @@
 
 class Object:
 
-    def __init__(self, name, obtype, health, x, y, player=None):
+    def __init__(self, name, obtype, health, x, y, player=None, steps=0):
         self.name = name
         self.obtype = obtype
         self.health = health
         self.x = x
         self.y = y
         self.player = player
+        self.steps = steps
+        self.targetX = None
+        self.targetY = None
+        self.order = None
 
     def onDeath(self):
         pass

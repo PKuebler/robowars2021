@@ -3,6 +3,8 @@ from pygame.locals import *
 import sys
 import pygame_gui
 import initializeGame
+from objects import *
+import gameLogic
 
 MAPSIZE = 10
 
@@ -54,11 +56,6 @@ def renderGame():
     FPSCLOCK.tick(30)
 
 
-# startet das Spiel
-def gameLogic():
-    pass
-
-
 def startGame():
     gameWindowInitialisation()
     #graphicsInitialisation()
@@ -73,8 +70,9 @@ def startGame():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-
-        gameLogic()
+            elif playerTurn:
+                #Aktion auswerten
+                gameLogic.handleEvents(event)
         renderGame()
 
 
