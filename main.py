@@ -2,8 +2,9 @@ import pygame
 from pygame.locals import *
 import sys
 import pygame_gui
-import Maps
+import initializeGame
 
+MAPSIZE = 10
 
 # BaseGame Initialisierung
 def gameWindowInitialisation():
@@ -62,12 +63,17 @@ def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
 
+    #beide Kartenlayer
+    terrainMap, objectMap = initializeGame.initGame(MAPSIZE)
+    #Variablen zum Start
+    playerTurn = True
+
     # GameLoop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
 
-        GameLogic()
+        gameLogic()
         renderGame()
 
 
