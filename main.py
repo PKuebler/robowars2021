@@ -13,28 +13,32 @@ MAPSIZE = 10
 # BaseGame Initialisierung
 def gameWindowInitialisation():
     pygame.init()
-    size = 1000, 800
-    global DISPLAYSURFACE
-    DISPLAYSURFACE = pygame.display.set_mode(size, DOUBLEBUF)
+    screenSize = 1000, 800    # window width & height
+    global screenSurfcace
+    screenSurfcace = pygame.display.set_mode(screenSize, DOUBLEBUF)
     global clock
     clock = pygame.time.Clock()
 
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
+    #initialisiert das gamemap array
     global map_data
     map_data = [[[] for i in range(10)] for i in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = random.randint(0, 1)
+            map_data[i][j] = random.randint(0, 2) # füttert die map mit random terraintypen
 
-    global wall, grass
-    wall = pygame.image.load('wall2.png').convert_alpha()  # load images
+    # ladet die bildaten
+    global wall, grass, ice
+    ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
+    wall = pygame.image.load('wall2.png').convert_alpha()
 
-
-# rendert das Spiel
-def renderGame():
+# rendert den Hintergrund
+def renderBackground():
+    night = 0, 0, 76
+    screenSurfcace.fill(night)
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     factor = 1.5  # größer = näher
@@ -45,28 +49,33 @@ def renderGame():
         for col_i, tile_content in enumerate(row_item):
             if tile_content == 1:
                 tileImage = wall
+            elif tile_content == 2:
+                tileImage = ice
             else:
                 tileImage = grass
             cart_x = row_i * TILEWIDTH_HALF
             cart_y = col_i * TILEHEIGHT_HALF
             iso_x = (cart_x - cart_y)
             iso_y = (cart_x + cart_y) / 2
-            centered_x = DISPLAYSURFACE.get_rect().centerx + iso_x
-            centered_y = DISPLAYSURFACE.get_rect().centery / 2 + iso_y
-            DISPLAYSURFACE.blit(tileImage, (centered_x, centered_y))  # display the actual tile
-    pygame.display.flip()
-    clock.tick(30)
+            centered_x = screenSurfcace.get_rect().centerx + iso_x
+            centered_y = screenSurfcace.get_rect().centery / 2 + iso_y
+            screenSurfcace.blit(tileImage, (centered_x, centered_y))  # display the actual tile
+
+
+# rendert das Spiel
+def renderGameObjects():
+    pass
 
 
 def renderGUI(event):
     global manager
     manager = pygame_gui.UIManager((1000, 800))
+    global textBoxGold
     textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
                                                 html_text="Enter Player Name Here",
                                                 manager=manager)
-    textBoxGold.set_active_effect(pygame_gui.TEXT_EFFECT_FADE_IN)
     checkForGuiEvent(event)
-    manager.draw_ui(DISPLAYSURFACE)
+    manager.draw_ui(screenSurfcace)
 
 
 def checkForGuiEvent(event):
@@ -74,6 +83,7 @@ def checkForGuiEvent(event):
     time_delta = clock.tick(60) / 1000.0
     manager.process_events(event)
     manager.update(time_delta)
+
 
 
 def startGame():
@@ -118,11 +128,10 @@ def startGame():
             #sonst spielerzug wieder starten
             playerTurn = True
 
-        renderGame()
+        renderBackground()
+        renderGameObjects()
         renderGUI(event)
-        pygame.display.update()
-
-
+        pygame.display.flip()
 
 
 # Press the green button in the gutter to run the script.
