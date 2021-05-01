@@ -64,14 +64,14 @@ def renderBackground():
 
 # rendert das Spiel
 def renderGameObjects():
-    pass # sollte ähnlich funktionieren wie bei renderBackground()
+    pass
 
 
 def renderGUI(event):
     global manager
     manager = pygame_gui.UIManager((1000, 800))
     global textBoxGold
-    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 33)),
+    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
                                                 html_text="Enter Player Name Here",
                                                 manager=manager)
     checkForGuiEvent(event)
@@ -91,7 +91,8 @@ def startGame():
     graphicsInitialisation()
 
     """variablen:
-    host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False - automatisch playerOne
+    host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
+    playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
     twoLocalPlayers: lokaler 2-Spieler-Modus
     twoLocalPlayersPlayerOne: nur für lokalen 2-Spieler-Modus: ist Player 1 dran? sonst Player 2
     playerOne: bin ich Spieler1? identische mit host
@@ -102,6 +103,7 @@ def startGame():
 
     # Host oder nicht?
     host = True
+    playerOneTurn = True
     twoLocalPlayers = False
     twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
@@ -122,23 +124,41 @@ def startGame():
     while True:
         for event in pygame.event.get():
             # Aktion auswerten
-            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, host,
+            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
                                                                      objectMap)
             #wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
-                # sendOrderToServer(order)
+                if twoLocalPlayers:
+                    if twoLocalPlayersPlayerOne:
+                        twoLocalPlayersPlayerOne = False
+                else:
+                    # sendOrderToServer(order)
+                    playerTurn = False
                 orders.append(order)
-                playerTurn = False
+
         # Spieler ist nicht am Zug: Warten auf Antwort vom server
         if not playerTurn:
-            # receiveOrderFromServer()
-            # time.sleep(1)
+            if twoLocalPlayers:
+                twoLocalPlayersPlayerOne = True
+            else:
+                #erstmal überspringen
+                pass
+                """
+                receivedOrders = False
+                while not receivedOrders:
+                    order = receiveOrderFromServer()
+                    if order != None:
+                        orders.append(order)
+                        receivedOrders = True
+                    else:
+                        time.sleep(1)"""
             #wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             #sonst spielerzug wieder starten
             playerTurn = True
+
             orders = []
 
         renderBackground()
