@@ -27,18 +27,19 @@ def gameWindowInitialisation():
 def graphicsInitialisation():
     # initialisiert das gamemap array
     global map_data
-    map_data = [[[] for i in range(10)] for i in range(10)]
+    map_data = [[[] for i in range(10)] for j in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = objects.Object("grass", "terrain", 10, 0, 0)  # füttert die map mit terraintypen
+            map_data[i][j] = objects.Object("grass", "terrain", 10, i, j)  # füttert die map mit terraintypen
             map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
-    global wall, grass, ice, underGround
+    global wall, grass, ice, underGround, hoverGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
+    hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
 
 TILE_WIDTH = 80 # 128
 TILE_HEIGHT = 40 # 64
@@ -64,10 +65,26 @@ def screenToMap(screenX, screenY):
     mapX = (screenX / TILE_WIDTH_HALF + screenY / TILE_HEIGHT_HALF) / 2
     mapY = (screenY / TILE_HEIGHT_HALF - (screenX / TILE_WIDTH_HALF)) / 2
 
-    return (round(mapX), round(mapY))
+    return (mapX, mapY)
+
+def tileOnPos(mapX, mapY):
+    mapPos = screenToMap(mapX, mapY)
+
+    mapX = round(mapPos[0])-1
+    mapY = round(mapPos[1])
+
+    if mapX < 0 or mapX >= len(map_data):
+        return None
+
+    if mapY < 0 or mapY >= len(map_data[mapX]):
+        return None
+
+    tile = map_data[mapX][mapY]
+
+    return tile
 
 # rendert den Hintergrund
-def renderBackground():
+def renderBackground(hoverTile):
     night = 0, 0, 76
     screenSurfcace.fill(night)
     screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
@@ -79,6 +96,9 @@ def renderBackground():
             tile.rect.move_ip(0,0)
             screenSurfcace.blit(tile.image, (iso[0], iso[1]))  # display the actual tile
 
+    if hoverTile != None:
+        screen = mapToScreen(hoverTile.x, hoverTile.y)
+        screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
 
 # renders GameObjects
 def renderGameObjects():
@@ -160,6 +180,8 @@ def startGame():
     roboto2.convert()
     rect = roboto2.get_rect()
     rect.center = roboto2.get_width() / 2, roboto2.get_height() / 2
+
+    hoverTile = None
 
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
@@ -247,14 +269,14 @@ def startGame():
 
 
             if event.type == MOUSEMOTION:
-                for i, row in enumerate(map_data):
-                    for j, tile in enumerate(row):
-                        print(screenToMap(event.pos[0], event.pos[1]))
+                tile = tileOnPos(event.pos[0], event.pos[1])
 
-                        if tile.rect.collidepoint(event.pos):
-                            print("hit")
-                        else:
-                            print("no hit")
+                if tile != None:
+                    hoverTile = tile
+                    print(("hit", tile))
+                else:
+                    hoverTile = None
+
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                  playerOneRobot, playerTwoRobot, terrainMap,
@@ -319,7 +341,7 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        renderBackground()
+        renderBackground(hoverTile)
         renderGameObjects()
         renderGUI()
         pygame.display.flip()
