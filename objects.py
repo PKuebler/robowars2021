@@ -1,65 +1,83 @@
 #!/usr/bin/env python3
+import pygame
+
 
 class Object:
+    if __name__ != '__main__':
+        def __init__(self, name, obtype, health, x, y, player=0, steps=0):
+            self.name = name
+            self.obtype = obtype
+            self.health = health
+            self.x = x
+            self.y = y
+            self.player = player
+            self.steps = steps
+            self.maxSteps = steps
+            self.targetX = None
+            self.targetY = None
+            self.shootAtX = self.x
+            self.shootAtY = self.y
+            self.order = None
+            self.image = None
+            self.rect = None
+            self.tileWidth = 64
+            self.tileHeight = 64
 
-    def __init__(self, name, obtype, health, x, y, player=0, steps=0):
-        self.name = name
-        self.obtype = obtype
-        self.health = health
-        self.x = x
-        self.y = y
-        self.player = player
-        self.steps = steps
-        self.maxSteps = steps
-        self.targetX = None
-        self.targetY = None
-        self.shootAtX = self.x
-        self.shootAtY = self.y
-        self.order = None
+        def setImage(self, img):
+            self.image = pygame.image.load(img).convert_alpha()
+            self.image.convert()
+            self.setRect()
 
-    def initNewRound(self):
-        self.steps = self.maxSteps
-        self.targetX = None
-        self.targetY = None
-        self.shootAtX = self.x
-        self.shootAtY = self.y
+        def setRect(self):
+            self.rect = self.image.get_rect()
+            self.rect.center = self.image.get_width() / 2, self.image.get_height() / 2
 
-    def onDeath(self):
-        pass
+        def moveRect(self, x, y):
+            self.rect.move(x, y)
 
-    def setTarget(self, shootAtX, shootAtY):
-        self.shootAtX = shootAtX
-        self.shootAtY = shootAtY
-        print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtX))
+        def initNewRound(self):
+            self.steps = self.maxSteps
+            self.targetX = None
+            self.targetY = None
+            self.shootAtX = self.x
+            self.shootAtY = self.y
 
-    def shoot(self, targetX, targetY, terrainMap, objectMap):
-        pass
+        def onDeath(self):
+            pass
 
-    def melee(self, targetX, targetY, terrainMap, objectMap):
-        pass
+        def setTarget(self, shootAtX, shootAtY):
+            self.shootAtX = shootAtX
+            self.shootAtY = shootAtY
+            print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtX))
 
-    def move(self, targetX, targetY, terrainMap, objectMap):
-        print("move")
-        self.printInfos()
-        self.targetX = targetX
-        self.targetY = targetY
-        self.steps -= 1
-        return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
+        def shoot(self, targetX, targetY, terrainMap, objectMap):
+            pass
 
-    def executeMove(self, terrainMap, objectMap):
-        self.printInfos()
-        #von alter stelle wegbewegen
-        objectMap[self.x][self.y] = None
-        self.x = self.targetX
-        self.y = self.targetY
-        #auf neue stelle in karte setzen
-        objectMap[self.x][self.y] = self
-        #ziele zurücksetzen
-        self.printInfos()
+        def melee(self, targetX, targetY, terrainMap, objectMap):
+            pass
 
+        def move(self, targetX, targetY, terrainMap, objectMap):
+            print("move")
+            self.printInfos()
+            self.targetX = targetX
+            self.targetY = targetY
+            self.steps -= 1
+            return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
 
-    def printInfos(self):
-        print(self.name + "," + str(self.health) + "@" + str(self.x) + "," + str(self.y))
+        def executeMove(self, terrainMap, objectMap):
+            self.printInfos()
+            # von alter stelle wegbewegen
+            objectMap[self.x][self.y] = None
+            self.x = self.targetX
+            self.y = self.targetY
+            # auf neue stelle in karte setzen
+            objectMap[self.x][self.y] = self
+            # ziele zurücksetzen
+            self.printInfos()
 
-    def jsonMe(self):
-        return {"name": self.name, "obtype": self.obtype, "health": self.health, "x": self.x, "y": self.y, "player": self.player, "steps": self.steps}
+        def printInfos(self):
+            print(self.name + "," + str(self.health) + "@" + str(self.x) + "," + str(self.y))
+
+        def jsonMe(self):
+            return {"name": self.name, "obtype": self.obtype, "health": self.health, "x": self.x, "y": self.y,
+                    "player": self.player, "steps": self.steps}

@@ -3,7 +3,7 @@ from pygame.locals import *
 import sys
 import pygame_gui
 import initializeGame
-#from objects import *
+import objects
 import gameLogic
 import random
 from client import *
@@ -25,12 +25,13 @@ def gameWindowInitialisation():
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
-    #initialisiert das gamemap array
+    # initialisiert das gamemap array
     global map_data
     map_data = [[[] for i in range(10)] for i in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = random.randint(0, 2) # füttert die map mit random terraintypen
+            map_data[i][j] = objects.Object("grass", "terrain", 10, 0, 0)  # füttert die map mit terraintypen
+            map_data[i][j].setImage("grass.png")
 
     # ladet die bildaten
     global wall, grass, ice, underGround
@@ -38,6 +39,7 @@ def graphicsInitialisation():
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
+
 
 # rendert den Hintergrund
 def renderBackground():
@@ -51,24 +53,19 @@ def renderBackground():
     TILEHEIGHT_HALF = TILEHEIGHT / factor
     TILEWIDTH_HALF = TILEWIDTH / factor
 
-    for row_i, row_item in enumerate(map_data):  # for every row_item of the map...
-        for col_i, tile_content in enumerate(row_item):
-            if tile_content == 1:
-                tileImage = wall
-            elif tile_content == 2:
-                tileImage = ice
-            else:
-                tileImage = grass
-            cart_x = row_i * TILEWIDTH_HALF
-            cart_y = col_i * TILEHEIGHT_HALF
+    for row_i, row_item in enumerate(map_data):  # for every row_item of the map. row_i = index of loop
+        for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
+            cart_x = row_i * tile.tileWidth/factor
+            cart_y = col_i * tile.tileHeight/factor
             iso_x = (cart_x - cart_y)
             iso_y = (cart_x + cart_y) / 2
             centered_x = screenSurfcace.get_rect().centerx + iso_x
             centered_y = screenSurfcace.get_rect().centery / 2 + iso_y
-            screenSurfcace.blit(tileImage, (centered_x, centered_y))  # display the actual tile
+            tile.rect.move_ip(0,0)
+            screenSurfcace.blit(tile.image, (centered_x, centered_y))  # display the actual tile
 
 
-# rendert das Spiel
+# renders GameObjects
 def renderGameObjects():
     pass
 
@@ -96,7 +93,7 @@ def guiInitialisation():
                                                     manager=ui_manager)
     global loginTextBox
     loginTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((0, 110),
-                                                                 (400, 200)), ui_manager)
+                                                                   (400, 200)), ui_manager)
     global loginButton
     loginButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((0, 160), (400, 50)),
                                                text='Confirm Name',
@@ -113,14 +110,16 @@ def checkForGuiEvents(event):
                     playerName = loginTextBox.get_text()
                     loginTextBox.set_text("")
                     playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
-                                                                    html_text="Your Name is: " + str(playerName) + ". Password please!",
+                                                                    html_text="Your Name is: " + str(
+                                                                        playerName) + ". Password please!",
                                                                     manager=ui_manager)
                 elif playerName != "" and playerPassword == "":
                     playerPassword = loginTextBox.get_text()
                     loginButton.set_text("Confirm Password")
                     playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
                                                                     html_text="Your Name is: " + str(
-                                                                    playerName) + ", Your Password is: " + str(playerPassword),
+                                                                        playerName) + ", Your Password is: " + str(
+                                                                        playerPassword),
                                                                     manager=ui_manager)
                     loginTextBox.set_text("Thank You.")
                     loginButton.set_text("Connect!")
@@ -134,6 +133,19 @@ def startGame():
     graphicsInitialisation()
     guiInitialisation()
 
+    roboto1 = pygame.image.load('robot1.png')
+    roboto1_mask = pygame.mask.from_surface(roboto1, 50)
+
+    roboto1.convert()
+    rect = roboto1.get_rect()
+    rect.center = roboto1.get_width() / 2, roboto1.get_height() / 2
+
+    roboto2 = pygame.image.load('robot2.png')
+    roboto2_mask = pygame.mask.from_surface(roboto2, 50)
+    roboto2.convert()
+    rect = roboto2.get_rect()
+    rect.center = roboto2.get_width() / 2, roboto2.get_height() / 2
+
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
     playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
@@ -144,7 +156,7 @@ def startGame():
     moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
-    #für Server
+    # für Server
     playerName = "Lars"
     sessionId = 12345
     # Host oder nicht?
@@ -152,7 +164,7 @@ def startGame():
     playerOneTurn = True
     twoLocalPlayers = True
     twoLocalPlayersPlayerOne = True
-    #online?
+    # online?
     if not twoLocalPlayers:
         sv = Client("pkuebler.de", 3210)
         sv.connect(playerName)
@@ -179,11 +191,12 @@ def startGame():
                 if data != None and "StartGameCmd" in data:
                     terrainMap = data["terrain"]
                     objMapJson = data["map"]
-                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson,
+                                                                                                        MAPSIZE)
                 else:
                     print(data["payload"])
                 time.sleep(1)
-    #offline
+    # offline
     else:
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
 
@@ -192,6 +205,7 @@ def startGame():
     moveMode = True
     orders = []
 
+    moving = False
     # GameLoop
     while True:
         global time_delta
@@ -199,11 +213,20 @@ def startGame():
         for event in pygame.event.get():
             checkForGuiEvents(event)
             ui_manager.process_events(event)
+
+
+            if event.type == MOUSEMOTION:
+                for i, row in enumerate(map_data):
+                    for j, tile in enumerate(row):
+                        if tile.rect.collidepoint(event.pos):
+                            print("hit")
+                        else:
+                            print("no hit")
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
-                                                                     playerOneRobot, playerTwoRobot, terrainMap,
-                                                                     objectMap)
-            #wenn korrektes event wurde befehl erzeugt: spielzug endet
+                                                                 playerOneRobot, playerTwoRobot, terrainMap,
+                                                                 objectMap)
+            # wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
                 if twoLocalPlayers:
                     if twoLocalPlayersPlayerOne:
@@ -211,17 +234,17 @@ def startGame():
                     else:
                         playerTurn = False
                 else:
-                    #order an server senden
+                    # order an server senden
                     sv.command(order)
                     playerTurn = False
                 orders.append(order)
 
         # Spieler ist nicht am Zug
         if not playerTurn:
-            #local: beide Befehle liegen vor
+            # local: beide Befehle liegen vor
             if twoLocalPlayers:
                 twoLocalPlayersPlayerOne = True
-            #online: Warten auf Antwort vom server
+            # online: Warten auf Antwort vom server
             else:
                 receivedOrders = False
                 while not receivedOrders:
@@ -238,10 +261,10 @@ def startGame():
                     receivedOrders = True
                 else:
                     time.sleep(1)
-            #wenn order vom server empfangen:
+            # wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
-            #prüfen ob zuende
-            #sonst spielerzug wieder starten
+            # prüfen ob zuende
+            # sonst spielerzug wieder starten
             playerTurn = True
             orders = []
 
