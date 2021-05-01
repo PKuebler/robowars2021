@@ -35,9 +35,8 @@ def graphicsInitialisation():
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('wall2.png').convert_alpha()
 
-
-# rendert das Spiel
-def renderGame():
+# rendert den Hintergrund
+def renderBackground():
     night = 0, 0, 76
     screenSurfcace.fill(night)
     TILEWIDTH = 64  # holds the tile width and height
@@ -61,7 +60,11 @@ def renderGame():
             centered_x = screenSurfcace.get_rect().centerx + iso_x
             centered_y = screenSurfcace.get_rect().centery / 2 + iso_y
             screenSurfcace.blit(tileImage, (centered_x, centered_y))  # display the actual tile
-    pygame.display.flip()
+
+
+# rendert das Spiel
+def renderGameObjects():
+    pass
 
 
 def renderGUI(event):
@@ -80,6 +83,7 @@ def checkForGuiEvent(event):
     time_delta = clock.tick(60) / 1000.0
     manager.process_events(event)
     manager.update(time_delta)
+
 
 
 def startGame():
@@ -124,9 +128,10 @@ def startGame():
             #sonst spielerzug wieder starten
             playerTurn = True
 
-        renderGame()
+        renderBackground()
+        renderGameObjects()
         renderGUI(event)
-        pygame.display.update()
+        pygame.display.flip()
 
 
 # Press the green button in the gutter to run the script.
