@@ -16,7 +16,7 @@ class Object:
         self.order = None
 
     def initNewRound(self):
-        steps = maxSteps
+        self.steps = self.maxSteps
 
     def onDeath(self):
         pass
@@ -35,16 +35,18 @@ class Object:
         return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
 
     def executeMove(self, terrainMap, objectMap):
+        self.printInfos()
         #von alter stelle wegbewegen
-        objectMap[x][y] = None
-        self.x = targetX
-        self.y = targetY
+        objectMap[self.x][self.y] = None
+        self.x = self.targetX
+        self.y = self.targetY
         #auf neue stelle in karte setzen
-        objectMap[x][y] = self
+        objectMap[self.x][self.y] = self
         #ziele zurücksetzen
         self.targetX = None
         self.targetY = None
+        self.printInfos()
 
 
     def printInfos(self):
-        print(self.name + "," + str(self.health))
+        print(self.name + "," + str(self.health) + "@" + str(self.x) + "," + str(self.y))
