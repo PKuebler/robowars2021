@@ -52,6 +52,7 @@ func (c *TcpClient) handshake() bool {
 	for {
 		n, err := c.reader.ReadString('\n')
 		if err != nil {
+			c.log.Error(err)
 			c.Close()
 			return false
 		}
@@ -61,17 +62,19 @@ func (c *TcpClient) handshake() bool {
 		}
 
 		payload, payloadType, ok := Unmarshal([]byte(n))
-		if ok {
+		if !ok {
+			c.log.Debug("no json format")
 			c.Close()
 			return false
 		}
 
-		if payloadType != "connect" {
+		if payloadType != "ConnectCmd" {
+			c.log.Debug("wrong handshake message %s", payloadType)
 			c.Close()
 			return false
 		}
 
-		connectCmd := payload.(ConnectCmd)
+		connectCmd := payload.(*ConnectCmd)
 
 		c.name = connectCmd.Name
 		c.log = c.log.WithField("name", c.name)
@@ -101,7 +104,7 @@ func (c *TcpClient) read() {
 			return
 		}
 
-		c.log.Debug("client send %s", payloadType)
+		c.log.Tracef("client send %s", payloadType)
 
 		switch payloadType {
 		case "JoinCmd":
