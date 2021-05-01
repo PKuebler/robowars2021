@@ -192,6 +192,9 @@ def startGame():
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "PlayerConnectEvt":
@@ -207,6 +210,9 @@ def startGame():
         else:
             waitingForPlayerOne = True
             while waitingForPlayerOne:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "GameStartedEvt":
@@ -260,11 +266,13 @@ def startGame():
                         twoLocalPlayersPlayerOne = False
                     else:
                         playerTurn = False
+                        receivedOrders = True ###
                 else:
                     # order an server senden
                     sv.command(order)
                     print("Befehl an Server geschickt")
                     playerTurn = False
+                    receivedOrders = False ###
                 orders.append(order)
 
         # Spieler ist nicht am Zug
@@ -274,37 +282,42 @@ def startGame():
                 twoLocalPlayersPlayerOne = True
             # online: Warten auf Antwort vom server
             else:
-                receivedOrders = False
-                while not receivedOrders:
-                    print("Warte auf Befehl vom Server")
-                    data = sv.read()
-                    if data != None:
-                        if "type" in data and data["type"] == "RoundEndEvt":
-                            for o in data["payload"]["commands"]:
-                                if o["player"] != playerName:
-                                    order = o
-                            receivedOrders = True
-                            print(order)
-                            print("Befehl erhalten")
-                        else:
-                            print("Kein RoundEndEvt")
-                            print(data["payload"])
-                    time.sleep(1)
-                if order != None:
-                    orders.append(order)
-                    receivedOrders = True
+                order = None
+                ##receivedOrders = False
+                #while not receivedOrders:
+                print("Warte auf Befehl vom Server")
+                data = sv.read()
+                if data != None:
+                    if "type" in data and data["type"] == "RoundEndEvt":
+                        for o in data["payload"]["commands"]:
+                            if o["player"] != playerName:
+                                ##order = o
+                                orders.append(o)
+                                receivedOrders = True
+                                print(o)
+                        print("Befehl erhalten")
+                    else:
+                        print("Kein RoundEndEvt")
+                        print(data["payload"])
+                        time.sleep(1)
                 else:
                     time.sleep(1)
+                #if order != None:
+                #    orders.append(order)
+                #    receivedOrders = True
+                #else:
+                #    time.sleep(1)
             #wenn order vom server empfangen:
-            print("führe befehle aus")
-            gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
-            #prüfen ob zuende
-            finished = gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
-            if finished and not twoLocalPlayers:
-                sv.leave()
-            #sonst spielerzug wieder starten
-            playerTurn = True
-            orders = []
+            if receivedOrders:
+                print("führe befehle aus")
+                gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
+                #prüfen ob zuende
+                finished = gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
+                if finished and not twoLocalPlayers:
+                    sv.leave()
+                #sonst spielerzug wieder starten
+                playerTurn = True
+                orders = []
 
         renderBackground()
         renderGameObjects()
