@@ -64,14 +64,14 @@ def renderBackground():
 
 # rendert das Spiel
 def renderGameObjects():
-    pass
+    pass # sollte ähnlich funktionieren wie bei renderBackground()
 
 
 def renderGUI(event):
     global manager
     manager = pygame_gui.UIManager((1000, 800))
     global textBoxGold
-    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
+    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 33)),
                                                 html_text="Enter Player Name Here",
                                                 manager=manager)
     checkForGuiEvent(event)
