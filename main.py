@@ -67,8 +67,8 @@ def screenToMap(screenX, screenY):
 
     return (mapX, mapY)
 
-def tileOnPos(mapX, mapY):
-    mapPos = screenToMap(mapX, mapY)
+def tileOnPos(screenX, screenY):
+    mapPos = screenToMap(screenX, screenY)
 
     mapX = round(mapPos[0])-1
     mapY = round(mapPos[1])
