@@ -69,8 +69,8 @@ class Client:
         msg = {"type": "StartGameCmd", "payload": {"terrain": t, "map": m, "round_seconds": roundSeconds}}
         self.write(json.dumps(msg))
 
-    def command(self, commandType, targetX, targetY):
-        msg = {"type": "CommandCmd", "payload": {"type": "move", "target_x": targetX, "target_y": targety}}
+    def command(self, command):
+        msg = {"type": "CommandCmd", "payload": command}
         self.write(json.dumps(msg))
 
 '''
