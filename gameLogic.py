@@ -112,6 +112,19 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()
 
+def checkIfOver(playerOneRobot, playerTwoRobot):
+    if playerOneRobot.health <= 0 and playerTwoRobot.health <= 0:
+        print("UNENTSCHIEDEN")
+        return True
+    elif playerOneRobot.health <= 0:
+        print("SPIELER 2 GEWINNT!")
+        return True
+    elif playerTwoRobot.health <= 0:
+        print("SPIELER 1 GEWINNT!")
+        return True
+    print("Weiter geht's...")
+    return False
+
 def visualize(terrainMap, objectMap):
     print('**********')
     for i in range(SIZE):

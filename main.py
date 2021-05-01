@@ -145,12 +145,12 @@ def startGame():
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
     #für Server
-    playerName = "Lars"
+    playerName = "Lars"         #ÄNDERN FÜR SPIELER 2
     sessionId = 12345
     # Host oder nicht?
-    host = True
+    host = True                 #ÄNDERN FÜR SPIELER 2 (False)
     playerOneTurn = True
-    twoLocalPlayers = True
+    twoLocalPlayers = True     #ÄNDERN FÜR ONLINE (False)
     twoLocalPlayersPlayerOne = True
     #online?
     if not twoLocalPlayers:
@@ -167,6 +167,7 @@ def startGame():
                 if data != None and "type" in data:
                     if data["type"] == "PlayerConnectEvt":
                         if data["payload"]["name"] != playerName:
+                            print(data["payload"]["name"] + " joined")
                             sv.startGame(terrainMap, jsonObjMap, 60)
                             waitingForPlayerTwo = False
                         else:
@@ -176,12 +177,13 @@ def startGame():
             waitingForPlayerOne = True
             while waitingForPlayerOne:
                 data = sv.read()
-                if data != None and "StartGameCmd" in data:
-                    terrainMap = data["terrain"]
-                    objMapJson = data["map"]
-                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
-                else:
-                    print(data["payload"])
+                if data != None:
+                    if "StartGameCmd" in data:
+                        terrainMap = data["terrain"]
+                        objMapJson = data["map"]
+                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                    else:
+                        print(data["payload"])
                 time.sleep(1)
     #offline
     else:
@@ -241,6 +243,9 @@ def startGame():
             #wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
+            finished = gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
+            if finished and not twoLocalPlayers:
+                sv.leave()
             #sonst spielerzug wieder starten
             playerTurn = True
             orders = []
