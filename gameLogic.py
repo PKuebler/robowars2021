@@ -34,6 +34,9 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     if order != None:
         orders = [order]
         executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
+        order = None
+        orders = None
+        playerOneRobot.initNewRound()
     return playerTurn, moveMode, order
 
 def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):

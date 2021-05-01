@@ -16,7 +16,7 @@ class Object:
         self.order = None
 
     def initNewRound(self):
-        steps = maxSteps
+        self.steps = self.maxSteps
 
     def onDeath(self):
         pass
