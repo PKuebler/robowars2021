@@ -63,6 +63,16 @@ class Object:
                 objectMap[targetX][targetY].changeHealth(BASE_DMG)
                 print("treffer bei " + objectMap[targetX][targetY].name)
 
+        def action_2(self, targetX, targetY, terrainMap, objectMap):
+            #aoe shooting attack
+            BASE_DMG = 2
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    if targetX+x >= 0 and targetY+y >= 0 and targetX+x < 10 and targetY+y < 10:
+                        if objectMap[targetX+x][targetY+y] != None:
+                            objectMap[targetX+x][targetY+y].changeHealth(BASE_DMG)
+                            print("treffer bei " + objectMap[targetX+x][targetY+y].name)
+
         def shoot(self, targetX, targetY, terrainMap, objectMap):
             pass
 
