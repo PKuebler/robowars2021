@@ -177,6 +177,9 @@ def startGame():
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "PlayerConnectEvt":
@@ -192,6 +195,9 @@ def startGame():
         else:
             waitingForPlayerOne = True
             while waitingForPlayerOne:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        sys.exit()
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "GameStartedEvt":
