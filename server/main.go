@@ -6,7 +6,9 @@ import (
 )
 
 func main() {
-	log := logrus.NewEntry(logrus.StandardLogger())
+	logger := logrus.StandardLogger()
+	logger.Level = logrus.TraceLevel
+	log := logrus.NewEntry(logger)
 
 	h := pkg.NewHub(log)
 

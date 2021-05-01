@@ -1,6 +1,8 @@
 package pkg
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // Message wrapper with message type
 type Message struct {
@@ -105,5 +107,5 @@ type CommandEvt struct {
 
 // RoundEndEvt send if all clients add a command or round timeout
 type RoundEndEvt struct {
-	Commands []CommandEvt
+	Commands []CommandEvt `json:"commands"`
 }
