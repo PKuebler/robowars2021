@@ -169,8 +169,10 @@ def startGame():
                         if data["payload"]["name"] != playerName:
                             print(data["payload"]["name"] + " joined")
                             sv.startGame(terrainMap, jsonObjMap, 60)
+                            print("StartGameCmd gesendet")
                             waitingForPlayerTwo = False
                         else:
+                            print("kein join:")
                             print(data["payload"])
                 time.sleep(1)
         else:
@@ -182,7 +184,10 @@ def startGame():
                         terrainMap = data["terrain"]
                         objMapJson = data["map"]
                         objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                        print(objectMap)
+                        print("Karten und StartGameCmd empfangen")
                     else:
+                        print("kein StartGameCmd")
                         print(data["payload"])
                 time.sleep(1)
     #offline
@@ -194,6 +199,7 @@ def startGame():
     moveMode = True
     orders = []
 
+    print("starte Gameloop")
     # GameLoop
     while True:
         global time_delta
@@ -215,6 +221,7 @@ def startGame():
                 else:
                     #order an server senden
                     sv.command(order)
+                    print("Befehl an Server geschickt")
                     playerTurn = False
                 orders.append(order)
 
@@ -227,12 +234,16 @@ def startGame():
             else:
                 receivedOrders = False
                 while not receivedOrders:
+                    print("Warte auf Befehl vom Server")
                     data = sv.read()
                     if data != None:
                         if "type" in data and data["type"] == "CommandCmd":
                             order = data["payload"]
                             receivedOrders = True
+                            print(order)
+                            print("Befehl erhalten")
                         else:
+                            print("Kein CommandCmd")
                             print(data["payload"])
                     time.sleep(1)
                 if order != None:
@@ -241,6 +252,7 @@ def startGame():
                 else:
                     time.sleep(1)
             #wenn order vom server empfangen:
+            print("führe befehle aus")
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             finished = gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
