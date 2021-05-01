@@ -56,12 +56,12 @@ class Object:
         self.steps -= 1
         return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
 
-    def executeMove(self, terrainMap, objectMap):
+    def executeMove(self, terrainMap, objectMap, targetX, targetY):
         self.printInfos()
         #von alter stelle wegbewegen
         objectMap[self.x][self.y] = None
-        self.x = self.targetX
-        self.y = self.targetY
+        self.x = targetX
+        self.y = targetY
         #auf neue stelle in karte setzen
         objectMap[self.x][self.y] = self
         #ziele zurücksetzen
