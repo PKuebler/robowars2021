@@ -103,7 +103,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         if order["ordertype"] == "move":
             print("moving")
             #bewegung ausführen über objekt
-            playerRobot.executeMove(terrainMap, objectMap)
+            playerRobot.executeMove(terrainMap, objectMap, order["x"], order["y"])
         #action_1
         elif order["ordertype"] == "action_1":
             print("action_1")
