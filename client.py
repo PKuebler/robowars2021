@@ -41,11 +41,15 @@ class Client:
             print("receiving")
             try:
                 data = data.decode('utf8').replace("'", '"')
-                data = json.loads(data)
+                data = data.split("\n")
+                jsondata = []
+                for d in data:
+                    jsondata.append(json.loads(d))
+                #data = json.loads(data)
             except:
                 print("Fehler beim Empfang:")
                 print(data)
-        return data
+        return jsondata
 
     def write(self, data):
         if self.socket == None:
