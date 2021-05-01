@@ -20,6 +20,8 @@ func NewMessage(t string, payload json.RawMessage) *Message {
 func (m *Message) Marshal() []byte {
 	msg, _ := json.Marshal(m)
 
+	msg = append(msg, "\n"...)
+
 	return msg
 }
 
