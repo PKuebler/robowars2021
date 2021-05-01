@@ -165,27 +165,25 @@ def startGame():
             while waitingForPlayerTwo:
                 data = sv.read()
                 if data != None:
-                    for d in data:
-                        if "type" in d and d["type"] == "PlayerConnectEvt":
-                            if d["payload"]["name"] != playerName:
-                                print(d["payload"]["name"] + " joined")
-                                sv.startGame(terrainMap, jsonObjMap, 60)
-                                waitingForPlayerTwo = False
-                            else:
-                                print(d["payload"])
+                    if "type" in data and data["type"] == "PlayerConnectEvt":
+                        if data["payload"]["name"] != playerName:
+                            print(data["payload"]["name"] + " joined")
+                            sv.startGame(terrainMap, jsonObjMap, 60)
+                            waitingForPlayerTwo = False
+                        else:
+                            print(data["payload"])
                 time.sleep(1)
         else:
             waitingForPlayerOne = True
             while waitingForPlayerOne:
                 data = sv.read()
                 if data != None:
-                    for d in data:
-                        if "StartGameCmd" in d:
-                            terrainMap = d["terrain"]
-                            objMapJson = d["map"]
-                            objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
-                        else:
-                            print(d["payload"])
+                    if "StartGameCmd" in data:
+                        terrainMap = data["terrain"]
+                        objMapJson = data["map"]
+                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                    else:
+                        print(data["payload"])
                 time.sleep(1)
     #offline
     else:
@@ -231,12 +229,11 @@ def startGame():
                 while not receivedOrders:
                     data = sv.read()
                     if data != None:
-                        for d in data:
-                            if "type" in d and d["type"] == "CommandCmd":
-                                order = d["payload"]
-                                receivedOrders = True
-                            else:
-                                print(d["payload"])
+                        if "type" in data and data["type"] == "CommandCmd":
+                            order = data["payload"]
+                            receivedOrders = True
+                        else:
+                            print(data["payload"])
                     time.sleep(1)
                 if order != None:
                     orders.append(order)
