@@ -38,6 +38,8 @@ def graphicsInitialisation():
 
 # rendert das Spiel
 def renderGame():
+    night = 0, 0, 76
+    screenSurfcace.fill(night)
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     factor = 1.5  # größer = näher
