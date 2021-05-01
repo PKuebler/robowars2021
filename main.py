@@ -111,15 +111,25 @@ def startGame():
     twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
-        # beide Kartenlayer
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
-        sv.startGame(terrainMap, jsonObjMap, 60)
+        if not twoLocalPlayers:
+            jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
+            waitingForPlayerTwo = True
+            while waitingForPlayerTwo:
+                data = sv.read()
+                if data != None and "JoinCmd" in data:
+                    sv.startGame(terrainMap, jsonObjMap, 60)
+                    waitingForPlayerTwo = False
     else:
-        pass
-        #if not twoLocalPlayers:
-        #    terrainMap, objectMap =
-        # receiveMapsFromServer(terrainMap, objectMap)
+        if not twoLocalPlayers:
+            sv.join(12345)
+            waitingForPlayerOne = True
+            while waitingForPlayerOne:
+                data = sv.read()
+                if data != None and "StartGameCmd" in data:
+                    terrainMap = data["terrain"]
+                    objMapJson = data["map"]
+                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson)
 
     # Variablen zum Start
     playerTurn = True

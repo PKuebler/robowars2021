@@ -37,6 +37,7 @@ class Client:
             return
 
         data = self.socket.recv(1024)
+        return data
 
     def write(self, data):
         if self.socket == None:
