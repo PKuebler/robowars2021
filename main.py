@@ -107,7 +107,7 @@ def startGame():
     # Host oder nicht?
     host = True
     playerOneTurn = True
-    twoLocalPlayers = True
+    twoLocalPlayers = False
     twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
@@ -118,9 +118,10 @@ def startGame():
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
                 data = sv.read()
-                if data != None and "JoinCmd" in data:
-                    sv.startGame(terrainMap, jsonObjMap, 60)
-                    waitingForPlayerTwo = False
+                if data != None and "type" in data:
+                    if data["type"] == "PlayerConnectEvt":
+                        sv.startGame(terrainMap, jsonObjMap, 60)
+                        waitingForPlayerTwo = False
     else:
         if not twoLocalPlayers:
             sv.join(12345)

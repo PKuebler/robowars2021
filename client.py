@@ -37,15 +37,20 @@ class Client:
             return
 
         data = self.socket.recv(1024)
+        if data != None:
+            print("receiving")
+            print(data)
+            data = data.decode('utf8').replace("'", '"')
+            print(data)
+            data = json.loads(data)
+            print(data)
         return data
 
     def write(self, data):
         if self.socket == None:
             self.reconnect()
         self.socket.sendall(bytes(data+'\n',encoding="utf-8"))
-        print("sending:")
-        print(data)
-
+        print("sending")
 
     def connect(self, name):
         msg = {"type": "ConnectCmd", "payload": {"name": name}}
