@@ -40,12 +40,12 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
             #aktiver roboter
             if playerOne:
                 playerRobot = playerOneRobot
-                print("sollte 1 sein")
-                print(playerRobot.player)
+                #print("sollte 1 sein")
+                #print(playerRobot.player)
             else:
                 playerRobot = playerTwoRobot
-                print("sollte 2 sein")
-                print(playerRobot.player)
+                #print("sollte 2 sein")
+                #print(playerRobot.player)
             #modus umschalten
             if event.key == pygame.K_SPACE:
                 moveMode = not moveMode
