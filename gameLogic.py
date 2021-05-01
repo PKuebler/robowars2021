@@ -18,13 +18,20 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
         if playerTurn:
             #bewegen
             if moveMode:
+                #oben
                 if event.key == pygame.K_UP:
+                    #spieler 1 + nicht am rand + nicht schritte verbraucht
                     if (playerOne and playerOneRobot.y-1 >= 0 and playerOneRobot.steps > 0):
+                        #feld frei?
                         if objectMap[playerOneRobot.x][playerOneRobot.y-1] == None:
+                            #order erzeugen
                             order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y-1, terrainMap, objectMap)
+                            #ascii
                             visualize(terrainMap, objectMap)
+                    #spieler 2
                     elif (not playerOne and playerTwoRobot.y-1 >= 0):
                         pass
+                #unten
                 if event.key == pygame.K_DOWN:
                     if (playerOne and playerOneRobot.y+1 < SIZE and playerOneRobot.steps > 0):
                         if objectMap[playerOneRobot.x][playerOneRobot.y+1] == None:
@@ -34,19 +41,26 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
     if order != None:
+        #orderliste, weil später immer 2 orders
         orders = [order]
+        #ausführen
         executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
+        #zurücksetzen für nächste runde
         order = None
         orders = None
+        #neue runde initialieren (z.B. Schritte zurücksetzen
         playerOneRobot.initNewRound()
     return playerTurn, moveMode, order
 
 def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     for order in orders:
+        #ordertyp
         if order["ordertype"] == "move":
+            #spieler
             if order["player_nr"] == 1:
                 print("moving")
+                #bewegung ausführen über objekt
                 playerOneRobot.executeMove(terrainMap, objectMap)
     visualize(terrainMap, objectMap)
 
