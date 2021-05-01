@@ -10,9 +10,13 @@ class Object:
         self.y = y
         self.player = player
         self.steps = steps
+        self.maxSteps = steps
         self.targetX = None
         self.targetY = None
         self.order = None
+
+    def initNewRound(self):
+        steps = maxSteps
 
     def onDeath(self):
         pass
@@ -24,7 +28,17 @@ class Object:
         pass
 
     def move(self, targetX, targetY, terrainMap, objectMap):
-        pass
+        print("move")
+        self.targetX = targetX
+        self.targetY = targetY
+        self.steps -= 1
+        return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
+
+    def executeMove(self):
+        self.x = targetX
+        self.y = targetY
+        self.targetX = None
+        self.targetY = None
 
     def printInfos(self):
         print(self.name + "," + str(self.health))

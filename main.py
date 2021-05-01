@@ -68,7 +68,7 @@ def renderGame():
 
 def startGame():
     gameWindowInitialisation()
-    #graphicsInitialisation()
+    graphicsInitialisation()
 
 
     #Host oder nicht?
@@ -103,7 +103,8 @@ def startGame():
         #Spieler ist nicht am Zug: Warten auf Antwort
         if not playerTurn:
             #receiveOrderFromServer()
-            time.sleep(1)
+            #time.sleep(1)
+            pass
         renderGame()
 
 
