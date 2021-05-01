@@ -2,13 +2,30 @@
 
 import pygame
 
-def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot):
+SIZE = 10
+
+def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap):
+    order = None
     #Mausklick auswerten
-    if pygame.MOUSEBUTTONUP:
+    if event.type == pygame.MOUSEBUTTONUP:
         pass
     #Tastatur auswerten
-    elif pygame.KEYUP:
+    elif event.type == pygame.KEYUP:
+        #bewegen
         if moveMode:
+            if event.key == pygame.K_UP:
+                if (playerOne and playerOneRobot.y-1 >= 0 and playerOneRobot.steps > 0):
+                    if objectMap[playerOneRobot.x][playerOneRobot.y-1] == None:
+                        order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y-1, terrainMap, objectMap)
+                        if playerOneRobot.steps == 0:
+                            playerTurn = not playerTurn
+                elif (not playerOne and playerTwoRobot.y-1 >= 0):
+                    pass
+    if order != None:
+        executeOrder(order)
+    return playerTurn, moveMode, order
 
-    return playerTurn, modeMode
-
+def executeOrder(order):
+    #nicht vergessen: beide Spieler gehen aufs gleiche feld
+    if order["ordertype"] == "move":
+        print("move")
