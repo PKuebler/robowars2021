@@ -62,5 +62,4 @@ class Object:
         print(self.name + "," + str(self.health) + "@" + str(self.x) + "," + str(self.y))
 
     def jsonMe(self):
-        #return {"name": self.name, "obtype" = self.obtype, "health" = self.health, "x" = self.x, "y" = self.y, "player" = self.player, "steps" = self.steps, "maxSteps" = self.maxSteps, "targetX" = self.targetX, "targetY" = self.targetY,"shootAtX" = self.shootAtX, "shootAtY" = self.shootAtY,"order" = self.order}
-        return {"name": self.name}
+        return {"name": self.name, "obtype": self.obtype, "health": self.health, "x": self.x, "y": self.y, "player": self.player, "steps": self.steps}

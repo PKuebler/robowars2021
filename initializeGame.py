@@ -53,25 +53,27 @@ def returnObjMapWithDicts(objectMap, SIZE):
             else:
                 ylist.append(None)
         list2d.append(ylist)
-    print(list2d)
     return list2d
 
 def createMapWithObjFromJson(jsonmap, SIZE):
     list2d=[]
+    playerOne = None
+    playerTwo = None
     for x in range(SIZE):
         ylist = []
         for y in range(SIZE):
             if jsonmap[x][y] != None:
                 obj = jsonmap[x][y]
-                tileinfo = Object(obj["name"], obj["obtype"], 5, x, y)
+                tileinfo = Object(obj["name"], obj["obtype"], obj["health"], obj["x"], obj["y"], obj["player"], obj["steps"])
+                if tileinfo.player == 1:
+                    playerOne = tileinfo
+                elif tileinfo.player == 2:
+                    playerTwo = tileinfo
             else:
                 tileinfo = None
             ylist.append(tileinfo)
         list2d.append(ylist)
-    #start der 2 spieler
-    list2d[4][1] = Object("Roboter von Spieler 1", "robot1", 10, 4, 1, 1, 2)
-    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 10, 5, 8, 2, 1)
-    return list2d, list2d[4][1], list2d[5][8]
+    return list2d, playerOne, playerTwo
 
 
 def removeBrockingObjects(list2d, size):

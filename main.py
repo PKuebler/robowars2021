@@ -133,7 +133,7 @@ def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
     guiInitialisation()
-    
+
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
     playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
@@ -179,7 +179,9 @@ def startGame():
                 if data != None and "StartGameCmd" in data:
                     terrainMap = data["terrain"]
                     objMapJson = data["map"]
-                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson)
+                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                else:
+                    print(data["payload"])
                 time.sleep(1)
     #offline
     else:
