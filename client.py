@@ -4,6 +4,19 @@ import socket
 import json
 import select
 
+# Commands
+# ConnectCmd {"type": "ConnectCmd", "payload": {"name": "Philipp"}}
+# JoinCmd {"type": "JoinCmd", "payload": {"code": "room code"}}
+# LeaveCmd {"type": "LeaveCmd", "payload": {}}
+# StartGameCmd {"type": "StartGameCmd", "payload": {"map": {}, "round_seconds": 60}}
+# CommandCmd {"type": "CommandCmd", "payload": {"type": "move", "target_x": 10, "target_y": 5}}
+
+# Events from Server
+# PlayerDisconnectEvt {"type": "PlayerDisconnectEvt", "payload": {"name": "player name"}}
+# PlayerConnectEvt {"type": "PlayerConnectEvt", "payload": {"name": "player name"}}
+# GameStartedEvt {"type": "GameStartedEvt", "payload": {"map": {}, "round_seconds": 60, "players": ["player name 1", "player name 2"]}}
+# RoundEndEvt {"type": "RoundEndEvt", "payload": {"commands": [{"player": "player name 1", "type": "move", "target_x": 4, "target_y": 20}]}}
+
 class Client:
     def __init__(self, host, port):
         self.host = host
@@ -30,6 +43,7 @@ class Client:
             self.reconnect()
         self.socket.sendall(bytes(data+'\n',encoding="utf-8"))
     
+
     def connect(self, name):
         msg = {"type": "ConnectCmd", "payload": {"name": name}}
         client.write(json.dumps(msg))
@@ -50,9 +64,18 @@ class Client:
         msg = {"type": "CommandCmd", "payload": {"type": "move", "target_x": targetX, "target_y": targety}}
         client.write(json.dumps(msg))
 
-client = Client("localhost", 3000)
+'''
+client = Client("pkuebler.de", 3210)
 client.connect("Philipp")
 
-client.read()
-client.read()
-client.read()
+client.startGame({"x": ...}, 60)
+client.comand("move", 20, 11)
+
+while True {
+    evt = client.read()
+    if evt.type == "GameStartedEvt":
+        print(evt.payload.map)
+    if evt.type == "RoundEndEvt":
+        print(evt.payload.commands)
+}
+'''
