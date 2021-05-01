@@ -2,6 +2,7 @@
 import sys
 
 import pygame
+import sys
 
 SIZE = 10
 
@@ -28,10 +29,10 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
     if order != None:
-        executeOrder(order)
+        executeOrder(order, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
-def executeOrder(order):
+def executeOrder(order, terrainMap, objectMap):
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     if order["ordertype"] == "move":
         print("move")
