@@ -30,6 +30,7 @@ type TcpClient struct {
 
 func NewTcpClient(conn net.Conn, log *logrus.Entry, hub *Hub) *TcpClient {
 	client := &TcpClient{
+		hub:         hub,
 		currentRoom: nil,
 
 		log:        log,
@@ -100,6 +101,7 @@ func (c *TcpClient) read() {
 
 		payload, payloadType, ok := Unmarshal([]byte(n))
 		if !ok {
+			c.log.Trace("wrong payload", payloadType, string(n))
 			c.Close()
 			return
 		}

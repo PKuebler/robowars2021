@@ -23,6 +23,14 @@ func NewHub(log *logrus.Entry) *Hub {
 }
 
 func (h *Hub) Join(client Client, cmd *JoinCmd) {
+	// is room empty?
+	for roomCode, room := range h.rooms {
+		if room.Empty() {
+			h.log.WithField("room", roomCode).Info("Close room")
+			delete(h.rooms, roomCode)
+		}
+	}
+
 	// exists room
 	r, ok := h.rooms[cmd.Code]
 	if !ok {
