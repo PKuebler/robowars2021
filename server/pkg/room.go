@@ -131,3 +131,7 @@ func (r *Room) Leave(client Client, cmd *LeaveCmd) {
 
 	r.Broadcast("PlayerDisconnectEvt", payload)
 }
+
+func (r *Room) Empty() bool {
+	return len(r.clients) == 0
+}

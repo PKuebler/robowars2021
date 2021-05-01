@@ -42,13 +42,26 @@ class Object:
             self.shootAtX = self.x
             self.shootAtY = self.y
 
-        def onDeath(self):
-            pass
+    def changeHealth(self, damage):
+        self.health -= damage
+        print("my health: " + str(self.health))
+        if self.health <= 0:
+            self.onDeath()
 
-        def setTarget(self, shootAtX, shootAtY):
-            self.shootAtX = shootAtX
-            self.shootAtY = shootAtY
-            print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtX))
+    def onDeath(self):
+        print("aaaargh")
+
+    def setTarget(self, shootAtX, shootAtY):
+        self.shootAtX = shootAtX
+        self.shootAtY = shootAtY
+        print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtY))
+
+    def action_1(self, targetX, targetY, terrainMap, objectMap):
+        #basic shooting attack
+        BASE_DMG = 5
+        if objectMap[targetX][targetY] != None:
+            objectMap[targetX][targetY].changeHealth(BASE_DMG)
+            print("treffer bei " + objectMap[targetX][targetY].name)
 
         def shoot(self, targetX, targetY, terrainMap, objectMap):
             pass
@@ -64,16 +77,16 @@ class Object:
             self.steps -= 1
             return {"ordertype": "move", "x": self.targetX, "y": self.targetY, "player_nr": self.player}
 
-        def executeMove(self, terrainMap, objectMap):
-            self.printInfos()
-            # von alter stelle wegbewegen
-            objectMap[self.x][self.y] = None
-            self.x = self.targetX
-            self.y = self.targetY
-            # auf neue stelle in karte setzen
-            objectMap[self.x][self.y] = self
-            # ziele zurücksetzen
-            self.printInfos()
+    def executeMove(self, terrainMap, objectMap, targetX, targetY):
+        self.printInfos()
+        #von alter stelle wegbewegen
+        objectMap[self.x][self.y] = None
+        self.x = targetX
+        self.y = targetY
+        #auf neue stelle in karte setzen
+        objectMap[self.x][self.y] = self
+        #ziele zurücksetzen
+        self.printInfos()
 
         def printInfos(self):
             print(self.name + "," + str(self.health) + "@" + str(self.x) + "," + str(self.y))
