@@ -12,7 +12,6 @@ class Client:
     
     def reconnect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#        self.socket.setblocking(False)
         self.socket.connect((self.host, self.port))
     
     def read(self):
