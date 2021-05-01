@@ -31,7 +31,7 @@ def graphicsInitialisation():
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
             map_data[i][j] = objects.Object("grass", "terrain", 10, 0, 0)  # füttert die map mit terraintypen
-            map_data[i][j].setImage("grass.png")
+            map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
     global wall, grass, ice, underGround
@@ -40,6 +40,31 @@ def graphicsInitialisation():
     wall = pygame.image.load('house1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
 
+TILE_WIDTH = 80 # 128
+TILE_HEIGHT = 40 # 64
+TILE_WIDTH_HALF = TILE_WIDTH / 2
+TILE_HEIGHT_HALF = TILE_HEIGHT / 2
+
+def mapToScreen(mapX, mapY):
+    CAMERA_X = screenSurfcace.get_rect().width / 2
+    CAMERA_Y = screenSurfcace.get_rect().height / 4 + 64
+
+    screenX = (mapX - mapY) * TILE_WIDTH_HALF + CAMERA_X
+    screenY = (mapX + mapY) * TILE_HEIGHT_HALF + CAMERA_Y
+
+    return (screenX, screenY)
+
+def screenToMap(screenX, screenY):    
+    CAMERA_X = screenSurfcace.get_rect().width / 2
+    CAMERA_Y = screenSurfcace.get_rect().height / 4 + 64
+
+    screenX = screenX - CAMERA_X
+    screenY = screenY - CAMERA_Y
+
+    mapX = (screenX / TILE_WIDTH_HALF + screenY / TILE_HEIGHT_HALF) / 2
+    mapY = (screenY / TILE_HEIGHT_HALF - (screenX / TILE_WIDTH_HALF)) / 2
+
+    return (round(mapX), round(mapY))
 
 # rendert den Hintergrund
 def renderBackground():
@@ -47,22 +72,12 @@ def renderBackground():
     screenSurfcace.fill(night)
     screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
 
-    TILEWIDTH = 64  # holds the tile width and height
-    TILEHEIGHT = 64
-    factor = 1.5  # größer = näher
-    TILEHEIGHT_HALF = TILEHEIGHT / factor
-    TILEWIDTH_HALF = TILEWIDTH / factor
-
     for row_i, row_item in enumerate(map_data):  # for every row_item of the map. row_i = index of loop
         for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
-            cart_x = row_i * tile.tileWidth/factor
-            cart_y = col_i * tile.tileHeight/factor
-            iso_x = (cart_x - cart_y)
-            iso_y = (cart_x + cart_y) / 2
-            centered_x = screenSurfcace.get_rect().centerx + iso_x
-            centered_y = screenSurfcace.get_rect().centery / 2 + iso_y
+            iso = mapToScreen(row_i, col_i)
+
             tile.rect.move_ip(0,0)
-            screenSurfcace.blit(tile.image, (centered_x, centered_y))  # display the actual tile
+            screenSurfcace.blit(tile.image, (iso[0], iso[1]))  # display the actual tile
 
 
 # renders GameObjects
@@ -228,6 +243,8 @@ def startGame():
             if event.type == MOUSEMOTION:
                 for i, row in enumerate(map_data):
                     for j, tile in enumerate(row):
+                        print(screenToMap(event.pos[0], event.pos[1]))
+
                         if tile.rect.collidepoint(event.pos):
                             print("hit")
                         else:
