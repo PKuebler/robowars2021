@@ -7,6 +7,7 @@ import initializeGame
 import gameLogic
 import random
 from client import *
+import time
 
 MAPSIZE = 10
 
@@ -101,30 +102,33 @@ def startGame():
     moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
-
-    sv = Client("pkuebler.de", 3210)
-    sv.connect("Lars")
+    playerName = "Lars"
     # Host oder nicht?
     host = True
     playerOneTurn = True
-    twoLocalPlayers = False
+    twoLocalPlayers = True
     twoLocalPlayersPlayerOne = True
-    # wenn host: karte generieren
-    if host:
+    #online?
+    if not twoLocalPlayers:
+        sv = Client("pkuebler.de", 3210)
+        sv.connect(playerName)
         sv.join(12345)
-        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        if not twoLocalPlayers:
+        # wenn host: karte generieren
+        if host:
+            terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
                 data = sv.read()
                 if data != None and "type" in data:
                     if data["type"] == "PlayerConnectEvt":
-                        sv.startGame(terrainMap, jsonObjMap, 60)
-                        waitingForPlayerTwo = False
-    else:
-        if not twoLocalPlayers:
-            sv.join(12345)
+                        if data["payload"]["name"] != playerName:
+                            sv.startGame(terrainMap, jsonObjMap, 60)
+                            waitingForPlayerTwo = False
+                        else:
+                            print(data["payload"])
+                time.sleep(1)
+        else:
             waitingForPlayerOne = True
             while waitingForPlayerOne:
                 data = sv.read()
@@ -132,6 +136,9 @@ def startGame():
                     terrainMap = data["terrain"]
                     objMapJson = data["map"]
                     objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson)
+                time.sleep(1)
+    else:
+        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
 
     # Variablen zum Start
     playerTurn = True

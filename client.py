@@ -37,13 +37,14 @@ class Client:
             return
 
         data = self.socket.recv(1024)
-        if data != None:
+        if data != None and data != "":
             print("receiving")
-            print(data)
-            data = data.decode('utf8').replace("'", '"')
-            print(data)
-            data = json.loads(data)
-            print(data)
+            try:
+                data = data.decode('utf8').replace("'", '"')
+                data = json.loads(data)
+            except:
+                print("Fehler beim Empfang:")
+                print(data)
         return data
 
     def write(self, data):
