@@ -7,6 +7,7 @@ import initializeGame
 import gameLogic
 import random
 from client import *
+import time
 
 MAPSIZE = 10
 
@@ -14,7 +15,8 @@ MAPSIZE = 10
 # BaseGame Initialisierung
 def gameWindowInitialisation():
     pygame.init()
-    screenSize = 1000, 800    # window width & height
+    global screenSize
+    screenSize = 1000, 800  # window width & height
     global screenSurfcace
     screenSurfcace = pygame.display.set_mode(screenSize, DOUBLEBUF)
     global clock
@@ -31,15 +33,18 @@ def graphicsInitialisation():
             map_data[i][j] = random.randint(0, 2) # füttert die map mit random terraintypen
 
     # ladet die bildaten
-    global wall, grass, ice
+    global wall, grass, ice, underGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
-    wall = pygame.image.load('wall2.png').convert_alpha()
+    wall = pygame.image.load('house1.png').convert_alpha()
+    underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
 
 # rendert den Hintergrund
 def renderBackground():
     night = 0, 0, 76
     screenSurfcace.fill(night)
+    screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
+
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     factor = 1.5  # größer = näher
@@ -68,29 +73,67 @@ def renderGameObjects():
     pass
 
 
-def renderGUI(event):
-    global manager
-    manager = pygame_gui.UIManager((1000, 800))
-    global textBoxGold
-    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
-                                                html_text="Enter Player Name Here",
-                                                manager=manager)
-    checkForGuiEvent(event)
-    manager.draw_ui(screenSurfcace)
+def renderGUI():
+    ui_manager.update(time_delta)
+    ui_manager.draw_ui(screenSurfcace)
 
 
-def checkForGuiEvent(event):
-    clock.tick(60)
-    time_delta = clock.tick(60) / 1000.0
-    manager.process_events(event)
-    manager.update(time_delta)
+def guiInitialisation():
+    global ui_manager
+    ui_manager = pygame_gui.UIManager(screenSize)
+    global clock
+    clock = pygame.time.Clock()
+    clock.tick(30)  # FPS Cap
 
+    global playerName
+    playerName = ""
+    global playerPassword
+    playerPassword = ""
+
+    global playerNameLabel
+    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                    html_text=str("Enter your name"),
+                                                    manager=ui_manager)
+    global loginTextBox
+    loginTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((0, 110),
+                                                                 (400, 200)), ui_manager)
+    global loginButton
+    loginButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((0, 160), (400, 50)),
+                                               text='Confirm Name',
+                                               manager=ui_manager)
+
+
+def checkForGuiEvents(event):
+    if event.type == pygame.USEREVENT:
+        if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == loginButton:
+                global playerName
+                global playerPassword
+                if playerName == "":
+                    playerName = loginTextBox.get_text()
+                    loginTextBox.set_text("")
+                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                                    html_text="Your Name is: " + str(playerName) + ". Password please!",
+                                                                    manager=ui_manager)
+                elif playerName != "" and playerPassword == "":
+                    playerPassword = loginTextBox.get_text()
+                    loginButton.set_text("Confirm Password")
+                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                                    html_text="Your Name is: " + str(
+                                                                    playerName) + ", Your Password is: " + str(playerPassword),
+                                                                    manager=ui_manager)
+                    loginTextBox.set_text("Thank You.")
+                    loginButton.set_text("Connect!")
+                elif playerName != "" and playerPassword != "":
+                    print("Connect to Server")
+                    # print(playerName)
 
 
 def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
-
+    guiInitialisation()
+    
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
     playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
@@ -101,29 +144,35 @@ def startGame():
     moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
-
-    sv = Client("pkuebler.de", 3210)
-    sv.connect("Lars")
+    #für Server
+    playerName = "Lars"
+    sessionId = 12345
     # Host oder nicht?
     host = True
     playerOneTurn = True
     twoLocalPlayers = True
     twoLocalPlayersPlayerOne = True
-    # wenn host: karte generieren
-    if host:
-        sv.join(12345)
-        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        if not twoLocalPlayers:
+    #online?
+    if not twoLocalPlayers:
+        sv = Client("pkuebler.de", 3210)
+        sv.connect(playerName)
+        sv.join(sessionId)
+        # wenn host: karte generieren
+        if host:
+            terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
                 data = sv.read()
-                if data != None and "JoinCmd" in data:
-                    sv.startGame(terrainMap, jsonObjMap, 60)
-                    waitingForPlayerTwo = False
-    else:
-        if not twoLocalPlayers:
-            sv.join(12345)
+                if data != None and "type" in data:
+                    if data["type"] == "PlayerConnectEvt":
+                        if data["payload"]["name"] != playerName:
+                            sv.startGame(terrainMap, jsonObjMap, 60)
+                            waitingForPlayerTwo = False
+                        else:
+                            print(data["payload"])
+                time.sleep(1)
+        else:
             waitingForPlayerOne = True
             while waitingForPlayerOne:
                 data = sv.read()
@@ -131,6 +180,10 @@ def startGame():
                     terrainMap = data["terrain"]
                     objMapJson = data["map"]
                     objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson)
+                time.sleep(1)
+    #offline
+    else:
+        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
 
     # Variablen zum Start
     playerTurn = True
@@ -139,7 +192,11 @@ def startGame():
 
     # GameLoop
     while True:
+        global time_delta
+        time_delta = clock.tick(60) / 1000.0
         for event in pygame.event.get():
+            checkForGuiEvents(event)
+            ui_manager.process_events(event)
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
@@ -152,37 +209,43 @@ def startGame():
                     else:
                         playerTurn = False
                 else:
-                    # sendOrderToServer(order)
+                    #order an server senden
+                    sv.command(order)
                     playerTurn = False
                 orders.append(order)
 
-        # Spieler ist nicht am Zug: Warten auf Antwort vom server
+        # Spieler ist nicht am Zug
         if not playerTurn:
+            #local: beide Befehle liegen vor
             if twoLocalPlayers:
                 twoLocalPlayersPlayerOne = True
+            #online: Warten auf Antwort vom server
             else:
-                #erstmal überspringen
-                pass
-                """
                 receivedOrders = False
                 while not receivedOrders:
-                    order = receiveOrderFromServer()
-                    if order != None:
-                        orders.append(order)
-                        receivedOrders = True
-                    else:
-                        time.sleep(1)"""
+                    data = sv.read()
+                    if data != None and "type" in data:
+                        if data["type"] == "CommandCmd":
+                            order = data["payload"]
+                            receivedOrders = True
+                        else:
+                            print(data["payload"])
+                    time.sleep(1)
+                if order != None:
+                    orders.append(order)
+                    receivedOrders = True
+                else:
+                    time.sleep(1)
             #wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             #sonst spielerzug wieder starten
             playerTurn = True
-
             orders = []
 
         renderBackground()
         renderGameObjects()
-        renderGUI(event)
+        renderGUI()
         pygame.display.flip()
 
 

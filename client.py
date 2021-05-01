@@ -37,15 +37,21 @@ class Client:
             return
 
         data = self.socket.recv(1024)
+        if data != None and data != "":
+            print("receiving")
+            try:
+                data = data.decode('utf8').replace("'", '"')
+                data = json.loads(data)
+            except:
+                print("Fehler beim Empfang:")
+                print(data)
         return data
 
     def write(self, data):
         if self.socket == None:
             self.reconnect()
         self.socket.sendall(bytes(data+'\n',encoding="utf-8"))
-        print("sending:")
-        print(data)
-
+        print("sending")
 
     def connect(self, name):
         msg = {"type": "ConnectCmd", "payload": {"name": name}}
@@ -63,8 +69,8 @@ class Client:
         msg = {"type": "StartGameCmd", "payload": {"terrain": t, "map": m, "round_seconds": roundSeconds}}
         self.write(json.dumps(msg))
 
-    def command(self, commandType, targetX, targetY):
-        msg = {"type": "CommandCmd", "payload": {"type": "move", "target_x": targetX, "target_y": targety}}
+    def command(self, command):
+        msg = {"type": "CommandCmd", "payload": command}
         self.write(json.dumps(msg))
 
 '''
