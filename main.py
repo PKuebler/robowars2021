@@ -13,6 +13,7 @@ MAPSIZE = 10
 # BaseGame Initialisierung
 def gameWindowInitialisation():
     pygame.init()
+    global screenSize
     screenSize = 1000, 800  # window width & height
     global screenSurfcace
     screenSurfcace = pygame.display.set_mode(screenSize, DOUBLEBUF)
@@ -30,16 +31,19 @@ def graphicsInitialisation():
             map_data[i][j] = random.randint(0, 2)  # füttert die map mit random terraintypen
 
     # ladet die bildaten
-    global wall, grass, ice
+    global wall, grass, ice, underGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
+    underGround = pygame.image.load('underGround.png').convert_alpha()
 
 
 # rendert den Hintergrund
 def renderBackground():
     night = 0, 0, 76
     screenSurfcace.fill(night)
+    screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
+
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     factor = 1.5  # größer = näher
@@ -69,13 +73,66 @@ def renderGameObjects():
 
 
 def renderGUI():
-    pass
+    ui_manager.update(time_delta)
+    ui_manager.draw_ui(screenSurfcace)
+
+
+def guiInitialisation():
+    global ui_manager
+    ui_manager = pygame_gui.UIManager(screenSize)
+    global clock
+    clock = pygame.time.Clock()
+    clock.tick(30)  # FPS Cap
+
+    global playerName
+    playerName = ""
+    global playerPassword
+    playerPassword = ""
+
+    global playerNameLabel
+    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                    html_text=str("Enter your name"),
+                                                    manager=ui_manager)
+    global loginTextBox
+    loginTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((0, 110),
+                                                                 (400, 200)), ui_manager)
+    global loginButton
+    loginButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((0, 160), (400, 50)),
+                                               text='Confirm Name',
+                                               manager=ui_manager)
+
+
+def checkForGuiEvents(event):
+    if event.type == pygame.USEREVENT:
+        if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == loginButton:
+                global playerName
+                global playerPassword
+                if playerName == "":
+                    playerName = loginTextBox.get_text()
+                    loginTextBox.set_text("")
+                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                                    html_text="Your Name is: " + str(playerName) + ". Password please!",
+                                                                    manager=ui_manager)
+                elif playerName != "" and playerPassword == "":
+                    playerPassword = loginTextBox.get_text()
+                    loginButton.set_text("Confirm Password")
+                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
+                                                                    html_text="Your Name is: " + str(
+                                                                    playerName) + ", Your Password is: " + str(playerPassword),
+                                                                    manager=ui_manager)
+                    loginTextBox.set_text("Thank You.")
+                    loginButton.set_text("Connect!")
+                elif playerName != "" and playerPassword != "":
+                    print("Connect to Server")
+                    # print(playerName)
 
 
 def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
-
+    guiInitialisation()
+    
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
     playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
@@ -108,7 +165,11 @@ def startGame():
 
     # GameLoop
     while True:
+        global time_delta
+        time_delta = clock.tick(60) / 1000.0
         for event in pygame.event.get():
+            checkForGuiEvents(event)
+            ui_manager.process_events(event)
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
