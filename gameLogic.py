@@ -22,16 +22,24 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                     if (playerOne and playerOneRobot.y-1 >= 0 and playerOneRobot.steps > 0):
                         if objectMap[playerOneRobot.x][playerOneRobot.y-1] == None:
                             order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y-1, terrainMap, objectMap)
-                            if playerOneRobot.steps == 0:
-                                playerTurn = not playerTurn
                     elif (not playerOne and playerTwoRobot.y-1 >= 0):
+                        pass
+                if event.key == pygame.K_DOWN:
+                    if (playerOne and playerOneRobot.y+1 < SIZE and playerOneRobot.steps > 0):
+                        if objectMap[playerOneRobot.x][playerOneRobot.y+1] == None:
+                            order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y+1, terrainMap, objectMap)
+                    elif (not playerOne and playerTwoRobot.y+1 >= 0):
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
     if order != None:
-        executeOrder(order, terrainMap, objectMap)
+        orders = [order]
+        executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     return playerTurn, moveMode, order
 
-def executeOrder(order, terrainMap, objectMap):
+def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
-    if order["ordertype"] == "move":
-        print("move")
+    for order in orders:
+        if order["ordertype"] == "move":
+            if order["player_nr"] == 1:
+                print("moving")
+                playerOneRobot.executeMove(terrainMap, objectMap)
