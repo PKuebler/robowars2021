@@ -50,6 +50,11 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
             if event.key == pygame.K_SPACE:
                 moveMode = not moveMode
                 print("movemode: " + str(moveMode))
+            #feuerbefehl
+            elif event.key == pygame.K_RETURN and not moveMode:
+                if playerRobot.shootAtX != playerRobot.x or playerRobot.shootAtY != playerRobot.y:
+                    print("shoot (action_1)")
+                    order = {"ordertype": "action_1", "x": playerRobot.shootAtX, "y": playerRobot.shootAtY, "player_nr": playerRobot.player}
             #bewegen
             else:
                 #oben
@@ -94,11 +99,15 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         else:
             playerRobot = playerTwoRobot
         #ordertyp
+        #bewegung
         if order["ordertype"] == "move":
-            #spieler
             print("moving")
             #bewegung ausführen über objekt
             playerRobot.executeMove(terrainMap, objectMap)
+        #action_1
+        elif order["ordertype"] == "action_1":
+            print("action_1")
+            playerRobot.action_1(order["x"], order["y"], terrainMap, objectMap)
     visualize(terrainMap, objectMap)
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()

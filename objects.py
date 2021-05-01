@@ -24,16 +24,26 @@ class Object:
         self.shootAtX = self.x
         self.shootAtY = self.y
 
+    def changeHealth(self, damage):
+        self.health -= damage
+        print("my health: " + str(self.health))
+        if self.health <= 0:
+            self.onDeath()
+
     def onDeath(self):
-        pass
+        print("aaaargh")
 
     def setTarget(self, shootAtX, shootAtY):
         self.shootAtX = shootAtX
         self.shootAtY = shootAtY
-        print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtX))
+        print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtY))
 
-    def shoot(self, targetX, targetY, terrainMap, objectMap):
-        pass
+    def action_1(self, targetX, targetY, terrainMap, objectMap):
+        #basic shooting attack
+        BASE_DMG = 5
+        if objectMap[targetX][targetY] != None:
+            objectMap[targetX][targetY].changeHealth(BASE_DMG)
+            print("treffer bei " + objectMap[targetX][targetY].name)
 
     def melee(self, targetX, targetY, terrainMap, objectMap):
         pass
