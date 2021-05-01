@@ -12,8 +12,6 @@ MAPSIZE = 10
 def gameWindowInitialisation():
     pygame.init()
     size = 1000, 800
-    global screen
-    #screen = pygame.display.set_mode(size)
     global DISPLAYSURFACE
     DISPLAYSURFACE = pygame.display.set_mode(size, DOUBLEBUF)
     global clock
