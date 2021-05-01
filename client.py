@@ -44,7 +44,8 @@ class Client:
                 data = data.split("\n")
                 jsondata = []
                 for d in data:
-                    jsondata.append(json.loads(d))
+                    if d != "":
+                        jsondata.append(json.loads(d))
                 #data = json.loads(data)
             except:
                 print("Fehler beim Empfang:")
