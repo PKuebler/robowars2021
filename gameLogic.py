@@ -11,3 +11,4 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
         if moveMode:
 
     return playerTurn, modeMode
+

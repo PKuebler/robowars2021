@@ -2,8 +2,11 @@ import pygame
 from pygame.locals import *
 import sys
 import pygame_gui
-import Maps
+import initializeGame
+from objects import *
+import gameLogic
 
+MAPSIZE = 10
 
 # BaseGame Initialisierung
 def gameWindowInitialisation():
@@ -63,21 +66,44 @@ def renderGame():
     clock.tick(30)
 
 
-# startet das Spiel
-def gameLogic():
-    pass
-
-
 def startGame():
     gameWindowInitialisation()
-    graphicsInitialisation()
+    #graphicsInitialisation()
+
+
+    #Host oder nicht?
+    host = True
+    #wenn host: karte generieren
+    if host:
+        #beide Kartenlayer
+        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
+        #Host ist Spieler 1
+        playerOne = True
+        #sendMapsToServer(terrainMap, objectMap)
+    else:
+        playerOne = False
+        #receiveMapsFromServer(terrainMap, objectMap)
+
+    #Variablen zum Start
+    playerTurn = True
+    moveMode = True
 
     # GameLoop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-
-        gameLogic()
+            #Spieler ist am Zug
+            elif playerTurn:
+                #Aktion auswerten
+                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap)
+                if order != None:
+                    pass
+                    #sendOrderToServer(order)
+                    playerTurn = False
+        #Spieler ist nicht am Zug: Warten auf Antwort
+        if not playerTurn:
+            #receiveOrderFromServer()
+            time.sleep(1)
         renderGame()
 
 
