@@ -113,7 +113,8 @@ def startGame():
     if host:
         # beide Kartenlayer
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        sv.startGame(terrainMap, 60)
+        jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
+        sv.startGame(terrainMap, jsonObjMap, 60)
     else:
         pass
         #if not twoLocalPlayers:
