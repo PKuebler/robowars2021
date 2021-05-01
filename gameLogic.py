@@ -22,12 +22,14 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                     if (playerOne and playerOneRobot.y-1 >= 0 and playerOneRobot.steps > 0):
                         if objectMap[playerOneRobot.x][playerOneRobot.y-1] == None:
                             order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y-1, terrainMap, objectMap)
+                            visualize(terrainMap, objectMap)
                     elif (not playerOne and playerTwoRobot.y-1 >= 0):
                         pass
                 if event.key == pygame.K_DOWN:
                     if (playerOne and playerOneRobot.y+1 < SIZE and playerOneRobot.steps > 0):
                         if objectMap[playerOneRobot.x][playerOneRobot.y+1] == None:
                             order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y+1, terrainMap, objectMap)
+                            visualize(terrainMap, objectMap)
                     elif (not playerOne and playerTwoRobot.y+1 >= 0):
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
@@ -46,3 +48,18 @@ def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
             if order["player_nr"] == 1:
                 print("moving")
                 playerOneRobot.executeMove(terrainMap, objectMap)
+    visualize(terrainMap, objectMap)
+
+def visualize(terrainMap, objectMap):
+    print('**********')
+    for i in range(SIZE):
+        for j in range(SIZE):
+            if objectMap[i][j] != None:
+                if objectMap[i][j].obtype == "wall":
+                    print('w', end='')
+                elif objectMap[i][j].obtype == "robot1":
+                    print('r', end='')
+            else:
+                print('.', end='')
+        print()
+    print('**********')
