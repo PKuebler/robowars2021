@@ -37,7 +37,7 @@ def graphicsInitialisation():
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
-    underGround = pygame.image.load('underGround.png').convert_alpha()
+    underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
 
 # rendert den Hintergrund
 def renderBackground():
