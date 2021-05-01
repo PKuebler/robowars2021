@@ -29,6 +29,7 @@ class Object:
 
     def move(self, targetX, targetY, terrainMap, objectMap):
         print("move")
+        self.printInfos()
         self.targetX = targetX
         self.targetY = targetY
         self.steps -= 1
