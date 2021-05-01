@@ -31,7 +31,7 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
         executeOrder(order, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
-def executeOrder(order):
+def executeOrder(order, terrainMap, objectMap):
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     if order["ordertype"] == "move":
         print("move")
