@@ -36,21 +36,36 @@ class Client:
         if len(read_ready) == 0:
             return
 
-        data = self.socket.recv(1024)
-        if data != None and data != "":
-            print("receiving")
-            try:
-                data = data.decode('utf8').replace("'", '"')
-                data = data.split("\n")
-                jsondata = []
-                for d in data:
-                    if d != "":
-                        jsondata.append(json.loads(d))
-                #data = json.loads(data)
-            except:
-                print("Fehler beim Empfang:")
-                print(data)
-        return jsondata
+        currentLine = b''
+        while not currentLine.decode('utf8').endswith('\n'):
+            currentLine += self.socket.recv(1)
+
+        try:
+            data = currentLine.decode('utf8').replace("'", '"')
+            data = json.loads(data)
+        except:
+            print("Fehler beim Empfang:")
+            print(data)
+
+        return data
+
+        '''
+                data = self.socket.recv(1024)
+                if data != None and data != "":
+                    print("receiving")
+                    try:
+                        data = data.decode('utf8').replace("'", '"')
+                        data = data.split("\n")
+                        jsondata = []
+                        for d in data:
+                            if d != "":
+                                jsondata.append(json.loads(d))
+                        #data = json.loads(data)
+                    except:
+                        print("Fehler beim Empfang:")
+                        print(data)
+                return jsondata
+        '''
 
     def write(self, data):
         if self.socket == None:
