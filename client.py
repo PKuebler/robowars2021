@@ -22,11 +22,11 @@ class Client:
         self.host = host
         self.port = port
         self.socket = None
-    
+
     def reconnect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
-    
+
     def read(self):
         if self.socket == None:
             self.reconnect()
@@ -42,27 +42,29 @@ class Client:
         if self.socket == None:
             self.reconnect()
         self.socket.sendall(bytes(data+'\n',encoding="utf-8"))
-    
+        print("sending:")
+        print(data)
+
 
     def connect(self, name):
         msg = {"type": "ConnectCmd", "payload": {"name": name}}
-        client.write(json.dumps(msg))
+        self.write(json.dumps(msg))
 
     def join(self, code):
         msg = {"type": "JoinCmd", "payload": {"code": code}}
-        client.write(json.dumps(msg))
+        self.write(json.dumps(msg))
 
     def leave(self):
         msg = {"type": "LeaveCmd", "payload": {}}
-        client.write(json.dumps(msg))
+        self.write(json.dumps(msg))
 
     def startGame(self, m, roundSeconds):
         msg = {"type": "StartGameCmd", "payload": {"map": m, "round_seconds": roundSeconds}}
-        client.write(json.dumps(msg))
+        self.write(json.dumps(msg))
 
     def command(self, commandType, targetX, targetY):
         msg = {"type": "CommandCmd", "payload": {"type": "move", "target_x": targetX, "target_y": targety}}
-        client.write(json.dumps(msg))
+        self.write(json.dumps(msg))
 
 '''
 client = Client("pkuebler.de", 3210)

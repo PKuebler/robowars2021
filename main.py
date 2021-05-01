@@ -3,9 +3,10 @@ from pygame.locals import *
 import sys
 import pygame_gui
 import initializeGame
-from objects import *
+#from objects import *
 import gameLogic
 import random
+from client import *
 
 MAPSIZE = 10
 
@@ -13,7 +14,7 @@ MAPSIZE = 10
 # BaseGame Initialisierung
 def gameWindowInitialisation():
     pygame.init()
-    screenSize = 1000, 800  # window width & height
+    screenSize = 1000, 800    # window width & height
     global screenSurfcace
     screenSurfcace = pygame.display.set_mode(screenSize, DOUBLEBUF)
     global clock
@@ -22,19 +23,18 @@ def gameWindowInitialisation():
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
-    # initialisiert das gamemap array
+    #initialisiert das gamemap array
     global map_data
     map_data = [[[] for i in range(10)] for i in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = random.randint(0, 2)  # füttert die map mit random terraintypen
+            map_data[i][j] = random.randint(0, 2) # füttert die map mit random terraintypen
 
     # ladet die bildaten
     global wall, grass, ice
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
-    wall = pygame.image.load('house1.png').convert_alpha()
-
+    wall = pygame.image.load('wall2.png').convert_alpha()
 
 # rendert den Hintergrund
 def renderBackground():
@@ -65,11 +65,26 @@ def renderBackground():
 
 # rendert das Spiel
 def renderGameObjects():
-    pass  # sollte ähnlich funktionieren wie bei renderBackground()
-
-
-def renderGUI():
     pass
+
+
+def renderGUI(event):
+    global manager
+    manager = pygame_gui.UIManager((1000, 800))
+    global textBoxGold
+    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
+                                                html_text="Enter Player Name Here",
+                                                manager=manager)
+    checkForGuiEvent(event)
+    manager.draw_ui(screenSurfcace)
+
+
+def checkForGuiEvent(event):
+    clock.tick(60)
+    time_delta = clock.tick(60) / 1000.0
+    manager.process_events(event)
+    manager.update(time_delta)
+
 
 
 def startGame():
@@ -87,6 +102,8 @@ def startGame():
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
 
+    sv = Client("pkuebler.de", 3210)
+    sv.connect("Lars")
     # Host oder nicht?
     host = True
     playerOneTurn = True
@@ -96,7 +113,7 @@ def startGame():
     if host:
         # beide Kartenlayer
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        # sendMapsToServer(terrainMap, objectMap)
+        sv.startGame(terrainMap, 60)
     else:
         pass
         # receiveMapsFromServer(terrainMap, objectMap)
@@ -151,7 +168,7 @@ def startGame():
 
         renderBackground()
         renderGameObjects()
-        renderGUI()
+        renderGUI(event)
         pygame.display.flip()
 
 
