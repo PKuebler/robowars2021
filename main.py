@@ -116,6 +116,8 @@ def startGame():
         sv.startGame(terrainMap, 60)
     else:
         pass
+        #if not twoLocalPlayers:
+        #    terrainMap, objectMap =
         # receiveMapsFromServer(terrainMap, objectMap)
 
     # Variablen zum Start
