@@ -111,6 +111,7 @@ def startGame():
     twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
+        sv.join(12345)
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
         if not twoLocalPlayers:
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
