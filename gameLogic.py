@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pygame
+import sys
 
 SIZE = 10
 
@@ -27,7 +28,7 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
     if order != None:
-        executeOrder(order)
+        executeOrder(order, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
 def executeOrder(order):
