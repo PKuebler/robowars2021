@@ -23,9 +23,9 @@ class Object:
             self.tileWidth = 64
             self.tileHeight = 64
 
-            if self.type == "robot1":
+            if self.obtype == "robot1":
                 self.image = pygame.image.load('robot1.png').convert_alpha()
-            elif self.type == "wall":
+            elif self.obtype == "wall":
                 self.image = pygame.image.load('house1.png').convert_alpha()
 
         def setImage(self, img):
