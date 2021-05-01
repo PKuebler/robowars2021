@@ -34,10 +34,11 @@ def graphicsInitialisation():
             map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
-    global wall, grass, ice, underGround, hoverGround
+    global wall, robot, grass, ice, underGround, hoverGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
-    grass = pygame.image.load('grass.png').convert_alpha()
+    grass = pygame.image.load('test80.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
+    robot = pygame.image.load('robot1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
     hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
 
@@ -67,41 +68,60 @@ def screenToMap(screenX, screenY):
 
     return (mapX, mapY)
 
-def tileOnPos(screenX, screenY):
+def tileOnPos(screenX, screenY, tileMap):
     mapPos = screenToMap(screenX, screenY)
 
     mapX = round(mapPos[0])-1
     mapY = round(mapPos[1])
 
-    if mapX < 0 or mapX >= len(map_data):
+    if mapX < 0 or mapX >= len(tileMap):
         return None
 
-    if mapY < 0 or mapY >= len(map_data[mapX]):
+    if mapY < 0 or mapY >= len(tileMap[mapX]):
         return None
 
-    tile = map_data[mapX][mapY]
+    tile = tileMap[mapX][mapY]
 
     return tile
 
 # rendert den Hintergrund
-def renderBackground(hoverTile):
+def renderBackground(terrainMap, hoverTile):
     night = 0, 0, 76
     screenSurfcace.fill(night)
+
+    if terrainMap == None:
+        return
+
     screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
 
-    for row_i, row_item in enumerate(map_data):  # for every row_item of the map. row_i = index of loop
+    for row_i, row_item in enumerate(terrainMap):  # for every row_item of the map. row_i = index of loop
         for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
             iso = mapToScreen(row_i, col_i)
-
-            tile.rect.move_ip(0,0)
-            screenSurfcace.blit(tile.image, (iso[0], iso[1]))  # display the actual tile
+            screenSurfcace.blit(grass, (iso[0], iso[1]))  # display the actual tile
 
     if hoverTile != None:
         screen = mapToScreen(hoverTile.x, hoverTile.y)
         screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
 
 # renders GameObjects
-def renderGameObjects():
+def renderGameObjects(objectMap):
+    if objectMap == None:
+        return
+
+    for row_i, row_item in enumerate(objectMap):  # for every row_item of the map. row_i = index of loop
+        for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
+            if tile == None:
+                continue
+
+            iso = mapToScreen(tile.x, tile.y)
+
+            if tile.obtype == "robot1":
+                image = robot
+            elif tile.obtype == "wall":
+                image = wall
+
+            screenSurfcace.blit(image, (iso[0], iso[1]))  # display the actual tile
+
     pass
 
 
@@ -269,7 +289,7 @@ def startGame():
 
 
             if event.type == MOUSEMOTION:
-                tile = tileOnPos(event.pos[0], event.pos[1])
+                tile = tileOnPos(event.pos[0], event.pos[1], objectMap)
 
                 if tile != None:
                     hoverTile = tile
@@ -341,8 +361,8 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        renderBackground(hoverTile)
-        renderGameObjects()
+        renderBackground(terrainMap, hoverTile)
+        renderGameObjects(objectMap)
         renderGUI()
         pygame.display.flip()
 
