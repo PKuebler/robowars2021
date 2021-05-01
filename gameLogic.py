@@ -5,6 +5,27 @@ import sys
 
 SIZE = 10
 
+def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
+    order = None
+    #noch schritte?
+    if playerRobot.steps > 0:
+        target_x = playerRobot.x + offset_x
+        target_y = playerRobot.y + offset_y
+        #feld auf Spielfeld?
+        if target_x >= 0 and target_x < SIZE and target_y >= 0 and target_y < SIZE:
+            #feld frei?
+            if objectMap[target_x][target_y] == None:
+                #order erzeugen
+                order = playerRobot.move(target_x, target_y, terrainMap, objectMap)
+    return order
+
+def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
+    target_x = playerRobot.shootAtX + offset_x
+    target_y = playerRobot.shootAtY + offset_y
+    #feld auf Spielfeld?
+    if target_x >= 0 and target_x < SIZE and target_y >= 0 and target_y < SIZE:
+        playerRobot.setTarget(target_x, target_y)
+
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap):
     order = None
     #Mausklick auswerten
@@ -16,39 +37,71 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     elif event.type == pygame.KEYUP:
         #ist der Spieler am Zug?
         if playerTurn:
+            #aktiver roboter
+            if playerOne:
+                playerRobot = playerOneRobot
+                print("sollte 1 sein")
+                print(playerRobot.player)
+            else:
+                playerRobot = playerTwoRobot
+                print("sollte 2 sein")
+                print(playerRobot.player)
+            #modus umschalten
+            if event.key == pygame.K_SPACE:
+                moveMode = not moveMode
+                print("movemode: " + str(moveMode))
             #bewegen
-            if moveMode:
+            else:
+                #oben
+                input_valid = False
                 if event.key == pygame.K_UP:
-                    if (playerOne and playerOneRobot.y-1 >= 0 and playerOneRobot.steps > 0):
-                        if objectMap[playerOneRobot.x][playerOneRobot.y-1] == None:
-                            order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y-1, terrainMap, objectMap)
-                            visualize(terrainMap, objectMap)
-                    elif (not playerOne and playerTwoRobot.y-1 >= 0):
-                        pass
-                if event.key == pygame.K_DOWN:
-                    if (playerOne and playerOneRobot.y+1 < SIZE and playerOneRobot.steps > 0):
-                        if objectMap[playerOneRobot.x][playerOneRobot.y+1] == None:
-                            order = playerOneRobot.move(playerOneRobot.x, playerOneRobot.y+1, terrainMap, objectMap)
-                            visualize(terrainMap, objectMap)
-                    elif (not playerOne and playerTwoRobot.y+1 >= 0):
-                        pass
-    #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
-    if order != None:
-        orders = [order]
-        executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
-        order = None
-        orders = None
-        playerOneRobot.initNewRound()
+                    #spieler 1 + nicht am rand + nicht schritte verbraucht
+                    offset_x = 0
+                    offset_y = -1
+                    input_valid = True
+                #unten
+                elif event.key == pygame.K_DOWN:
+                    offset_x = 0
+                    offset_y = 1
+                    input_valid = True
+                #links
+                elif event.key == pygame.K_LEFT:
+                    offset_x = -1
+                    offset_y = 0
+                    input_valid = True
+                #rechts
+                elif event.key == pygame.K_RIGHT:
+                    offset_x = 1
+                    offset_y = 0
+                    input_valid = True
+                if input_valid:
+                    if moveMode:
+                        order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    else:
+                        changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
-def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
+def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
+    print("execute")
+    print(orders)
+
+    #TODO
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     for order in orders:
+        #roboter wählen
+        if order["player_nr"] == 1:
+            playerRobot = playerOneRobot
+        else:
+            playerRobot = playerTwoRobot
+        #ordertyp
         if order["ordertype"] == "move":
-            if order["player_nr"] == 1:
-                print("moving")
-                playerOneRobot.executeMove(terrainMap, objectMap)
+            #spieler
+            print("moving")
+            #bewegung ausführen über objekt
+            playerRobot.executeMove(terrainMap, objectMap)
     visualize(terrainMap, objectMap)
+    playerOneRobot.initNewRound()
+    playerTwoRobot.initNewRound()
 
 def visualize(terrainMap, objectMap):
     print('**********')

@@ -13,28 +13,33 @@ MAPSIZE = 10
 # BaseGame Initialisierung
 def gameWindowInitialisation():
     pygame.init()
-    size = 1000, 800
-    global DISPLAYSURFACE
-    DISPLAYSURFACE = pygame.display.set_mode(size, DOUBLEBUF)
+    screenSize = 1000, 800  # window width & height
+    global screenSurfcace
+    screenSurfcace = pygame.display.set_mode(screenSize, DOUBLEBUF)
     global clock
     clock = pygame.time.Clock()
 
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
+    # initialisiert das gamemap array
     global map_data
     map_data = [[[] for i in range(10)] for i in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = random.randint(0, 1)
+            map_data[i][j] = random.randint(0, 2)  # füttert die map mit random terraintypen
 
-    global wall, grass
-    wall = pygame.image.load('wall2.png').convert_alpha()  # load images
+    # ladet die bildaten
+    global wall, grass, ice
+    ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('grass.png').convert_alpha()
+    wall = pygame.image.load('house1.png').convert_alpha()
 
 
-# rendert das Spiel
-def renderGame():
+# rendert den Hintergrund
+def renderBackground():
+    night = 0, 0, 76
+    screenSurfcace.fill(night)
     TILEWIDTH = 64  # holds the tile width and height
     TILEHEIGHT = 64
     factor = 1.5  # größer = näher
@@ -45,84 +50,109 @@ def renderGame():
         for col_i, tile_content in enumerate(row_item):
             if tile_content == 1:
                 tileImage = wall
+            elif tile_content == 2:
+                tileImage = ice
             else:
                 tileImage = grass
             cart_x = row_i * TILEWIDTH_HALF
             cart_y = col_i * TILEHEIGHT_HALF
             iso_x = (cart_x - cart_y)
             iso_y = (cart_x + cart_y) / 2
-            centered_x = DISPLAYSURFACE.get_rect().centerx + iso_x
-            centered_y = DISPLAYSURFACE.get_rect().centery / 2 + iso_y
-            DISPLAYSURFACE.blit(tileImage, (centered_x, centered_y))  # display the actual tile
-    pygame.display.flip()
-    clock.tick(30)
+            centered_x = screenSurfcace.get_rect().centerx + iso_x
+            centered_y = screenSurfcace.get_rect().centery / 2 + iso_y
+            screenSurfcace.blit(tileImage, (centered_x, centered_y))  # display the actual tile
 
 
-def renderGUI(event):
-    global manager
-    manager = pygame_gui.UIManager((1000, 800))
-    textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
-                                                html_text="Enter Player Name Here",
-                                                manager=manager)
-    textBoxGold.set_active_effect(pygame_gui.TEXT_EFFECT_FADE_IN)
-    checkForGuiEvent(event)
-    manager.draw_ui(DISPLAYSURFACE)
+# rendert das Spiel
+def renderGameObjects():
+    pass  # sollte ähnlich funktionieren wie bei renderBackground()
 
 
-def checkForGuiEvent(event):
-    clock.tick(60)
-    time_delta = clock.tick(60) / 1000.0
-    manager.process_events(event)
-    manager.update(time_delta)
+def renderGUI():
+    pass
 
 
 def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
 
+    """variablen:
+    host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
+    playerOneTurn: Bei local Coop relevant: Ist Spieler1 dran, sonst Spieler2
+    twoLocalPlayers: lokaler 2-Spieler-Modus
+    twoLocalPlayersPlayerOne: nur für lokalen 2-Spieler-Modus: ist Player 1 dran? sonst Player 2
+    playerOne: bin ich Spieler1? identische mit host
+    playerTurn: Ist der/sind die Spieler am Zug; wenn beide Orders vorliegen, auf False setzen für Abarbeitung
+    moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
+    playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
+    """
+
     # Host oder nicht?
     host = True
+    playerOneTurn = True
+    twoLocalPlayers = True
+    twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
         # beide Kartenlayer
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        # Host ist Spieler 1
-        playerOne = True
         # sendMapsToServer(terrainMap, objectMap)
     else:
-        playerOne = False
+        pass
         # receiveMapsFromServer(terrainMap, objectMap)
 
     # Variablen zum Start
     playerTurn = True
     moveMode = True
+    orders = []
 
     # GameLoop
     while True:
         for event in pygame.event.get():
             # Aktion auswerten
-            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne,
+            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
                                                                      objectMap)
             #wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
-                # sendOrderToServer(order)
-                playerTurn = False
+                if twoLocalPlayers:
+                    if twoLocalPlayersPlayerOne:
+                        twoLocalPlayersPlayerOne = False
+                    else:
+                        playerTurn = False
+                else:
+                    # sendOrderToServer(order)
+                    playerTurn = False
+                orders.append(order)
+
         # Spieler ist nicht am Zug: Warten auf Antwort vom server
         if not playerTurn:
-            # receiveOrderFromServer()
-            # time.sleep(1)
+            if twoLocalPlayers:
+                twoLocalPlayersPlayerOne = True
+            else:
+                #erstmal überspringen
+                pass
+                """
+                receivedOrders = False
+                while not receivedOrders:
+                    order = receiveOrderFromServer()
+                    if order != None:
+                        orders.append(order)
+                        receivedOrders = True
+                    else:
+                        time.sleep(1)"""
             #wenn order vom server empfangen:
-            #ausführen aller order (in gameLogic.executeOrders(orders))
+            gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             #sonst spielerzug wieder starten
             playerTurn = True
 
-        renderGame()
-        renderGUI(event)
-        pygame.display.update()
+            orders = []
 
-
+        renderBackground()
+        renderGameObjects()
+        renderGUI()
+        pygame.display.flip()
 
 
 # Press the green button in the gutter to run the script.
