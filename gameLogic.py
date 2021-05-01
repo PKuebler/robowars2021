@@ -19,6 +19,13 @@ def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
                 order = playerRobot.move(target_x, target_y, terrainMap, objectMap)
     return order
 
+def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
+    target_x = playerRobot.shootAtX + offset_x
+    target_y = playerRobot.shootAtY + offset_y
+    #feld auf Spielfeld?
+    if target_x >= 0 and target_x < SIZE and target_y >= 0 and target_y < SIZE:
+        playerRobot.setTarget(target_x, target_y)
+
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap):
     order = None
     #Mausklick auswerten
@@ -39,29 +46,39 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                 playerRobot = playerTwoRobot
                 print("sollte 2 sein")
                 print(playerRobot.player)
+            #modus umschalten
+            if event.key == pygame.K_SPACE:
+                moveMode = not moveMode
+                print("movemode: " + str(moveMode))
             #bewegen
-            if moveMode:
+            else:
                 #oben
+                input_valid = False
                 if event.key == pygame.K_UP:
                     #spieler 1 + nicht am rand + nicht schritte verbraucht
                     offset_x = 0
                     offset_y = -1
-                    order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    input_valid = True
                 #unten
                 elif event.key == pygame.K_DOWN:
                     offset_x = 0
                     offset_y = 1
-                    order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    input_valid = True
                 #links
                 elif event.key == pygame.K_LEFT:
                     offset_x = -1
                     offset_y = 0
-                    order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    input_valid = True
                 #rechts
                 elif event.key == pygame.K_RIGHT:
                     offset_x = 1
                     offset_y = 0
-                    order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    input_valid = True
+                if input_valid:
+                    if moveMode:
+                        order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                    else:
+                        changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
 def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):

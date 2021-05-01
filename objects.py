@@ -13,13 +13,24 @@ class Object:
         self.maxSteps = steps
         self.targetX = None
         self.targetY = None
+        self.shootAtX = self.x
+        self.shootAtY = self.y
         self.order = None
 
     def initNewRound(self):
         self.steps = self.maxSteps
+        self.targetX = None
+        self.targetY = None
+        self.shootAtX = self.x
+        self.shootAtY = self.y
 
     def onDeath(self):
         pass
+
+    def setTarget(self, shootAtX, shootAtY):
+        self.shootAtX = shootAtX
+        self.shootAtY = shootAtY
+        print("Aiming @ " + str(self.shootAtX) + "," + str(self.shootAtX))
 
     def shoot(self, targetX, targetY, terrainMap, objectMap):
         pass
@@ -44,8 +55,6 @@ class Object:
         #auf neue stelle in karte setzen
         objectMap[self.x][self.y] = self
         #ziele zurücksetzen
-        self.targetX = None
-        self.targetY = None
         self.printInfos()
 
 
