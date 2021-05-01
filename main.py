@@ -64,6 +64,7 @@ def renderGUI(event):
     textBoxGold = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((200, 250), (250, 30)),
                                                 html_text="Enter Player Name Here",
                                                 manager=manager)
+    textBoxGold.set_active_effect(pygame_gui.TEXT_EFFECT_FADE_IN)
     checkForGuiEvent(event)
     manager.draw_ui(DISPLAYSURFACE)
 
