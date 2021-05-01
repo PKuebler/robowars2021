@@ -95,8 +95,18 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     print("execute")
     print(orders)
 
-    #TODO
-    #nicht vergessen: beide Spieler gehen aufs gleiche feld
+    pygame.mixer.init()
+
+    #beide Spieler gehen aufs gleiche feld
+    if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"]:
+        playerOneRobot.changeHealth(2)
+        playerTwoRobot.changeHealth(2)
+        #beenden, da kollision
+        playerOneRobot.initNewRound()
+        playerTwoRobot.initNewRound()
+        return
+
+
     for order in orders:
         #roboter wählen
         if order["player_nr"] == 1:
@@ -104,29 +114,27 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         else:
             playerRobot = playerTwoRobot
 
-        pygame.mixer.init()
-
         #ordertyp
         #bewegung
         if order["ordertype"] == "move":
             print("moving")
-            pygame.mixer.music.load("204431__jaraxe__robot-walk.ogg")
+            #pygame.mixer.music.load("204431__jaraxe__robot-walk.ogg")
+            pygame.mixer.Channel(0).play(pygame.mixer.Sound("204431__jaraxe__robot-walk.ogg"))
             #bewegung ausführen über objekt
             playerRobot.executeMove(terrainMap, objectMap, order["x"], order["y"])
         #action_1
         elif order["ordertype"] == "action_1":
             print("action_1")
-            pygame.mixer.music.load("517939__slopemstr__laser-artillery-sound-effect.ogg")
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound("517939__slopemstr__laser-artillery-sound-effect.ogg"))
             playerRobot.action_1(order["x"], order["y"], terrainMap, objectMap)
         #action2
         elif order["ordertype"] == "action_2":
             print("action_2")
             playerRobot.action_2(order["x"], order["y"], terrainMap, objectMap)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound("399303__deleted-user-5405837__explosion-012.ogg"))
     visualize(terrainMap, objectMap)
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()
-
-    pygame.mixer.music.play()
 
 
 def checkIfOver(playerOneRobot, playerTwoRobot):
