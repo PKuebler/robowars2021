@@ -243,7 +243,9 @@ def startGame():
             #wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
-            gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
+            finished = gameLogic.checkIfOver(playerOneRobot, playerTwoRobot)
+            if finished and not twoLocalPlayers:
+                sv.leave()
             #sonst spielerzug wieder starten
             playerTurn = True
             orders = []
