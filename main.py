@@ -90,43 +90,56 @@ def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
 
+    """variablen:
+    host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False - automatisch playerOne
+    twoLocalPlayers: lokaler 2-Spieler-Modus
+    twoLocalPlayersPlayerOne: nur für lokalen 2-Spieler-Modus: ist Player 1 dran? sonst Player 2
+    playerOne: bin ich Spieler1? identische mit host
+    playerTurn: Ist der/sind die Spieler am Zug; wenn beide Orders vorliegen, auf False setzen für Abarbeitung
+    moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
+    playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
+    """
+
     # Host oder nicht?
     host = True
+    twoLocalPlayers = False
+    twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
         # beide Kartenlayer
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        # Host ist Spieler 1
-        playerOne = True
         # sendMapsToServer(terrainMap, objectMap)
     else:
-        playerOne = False
+        pass
         # receiveMapsFromServer(terrainMap, objectMap)
 
     # Variablen zum Start
     playerTurn = True
     moveMode = True
+    orders = []
 
     # GameLoop
     while True:
         for event in pygame.event.get():
             # Aktion auswerten
-            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne,
+            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, host,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
                                                                      objectMap)
             #wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
                 # sendOrderToServer(order)
+                orders.append(order)
                 playerTurn = False
         # Spieler ist nicht am Zug: Warten auf Antwort vom server
         if not playerTurn:
             # receiveOrderFromServer()
             # time.sleep(1)
             #wenn order vom server empfangen:
-            #ausführen aller order (in gameLogic.executeOrders(orders))
+            gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             #sonst spielerzug wieder starten
             playerTurn = True
+            orders = []
 
         renderBackground()
         renderGameObjects()

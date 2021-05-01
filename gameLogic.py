@@ -40,19 +40,19 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                     elif (not playerOne and playerTwoRobot.y+1 >= 0):
                         pass
     #NUR ZUM TESTEN - SPAETER AUFRUF NUR AUS MAIN
-    if order != None:
+    #if order != None:
         #orderliste, weil später immer 2 orders
-        orders = [order]
+        #orders = [order]
         #ausführen
-        executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
+        #executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         #zurücksetzen für nächste runde
-        order = None
-        orders = None
+        #order = None
+        #orders = None
         #neue runde initialieren (z.B. Schritte zurücksetzen
-        playerOneRobot.initNewRound()
+        #playerOneRobot.initNewRound()
     return playerTurn, moveMode, order
 
-def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
+def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     for order in orders:
         #ordertyp
@@ -63,6 +63,7 @@ def executeOrder(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
                 #bewegung ausführen über objekt
                 playerOneRobot.executeMove(terrainMap, objectMap)
     visualize(terrainMap, objectMap)
+    playerOneRobot.initNewRound()
 
 def visualize(terrainMap, objectMap):
     print('**********')
