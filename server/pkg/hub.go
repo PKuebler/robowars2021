@@ -26,7 +26,9 @@ func (h *Hub) Join(client Client, cmd *JoinCmd) {
 	// exists room
 	r, ok := h.rooms[cmd.Code]
 	if !ok {
-		h.log.Debug("Do nothing, room not exists")
+		h.log.Debug("room not exists")
+		r = NewRoom(cmd.Code, h.log)
+		h.rooms[cmd.Code] = r
 	}
 
 	r.Join(client)
