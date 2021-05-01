@@ -148,7 +148,7 @@ def startGame():
     playerName = "Lars"         #ÄNDERN FÜR SPIELER 2
     sessionId = "12345"
     # Host oder nicht?
-    host = True                 #ÄNDERN FÜR SPIELER 2 (False)
+    host = False                 #ÄNDERN FÜR SPIELER 2 (False)
     playerOneTurn = True
     twoLocalPlayers = False     #ÄNDERN FÜR ONLINE (False)
     twoLocalPlayersPlayerOne = True
@@ -180,15 +180,16 @@ def startGame():
             while waitingForPlayerOne:
                 data = sv.read()
                 if data != None:
-                    if "StartGameCmd" in data:
-                        terrainMap = data["terrain"]
-                        objMapJson = data["map"]
+                    if "type" in data and data["type"] == "GameStartedEvt":
+                        terrainMap = data["payload"]["terrain"]
+                        objMapJson = data["payload"]["map"]
                         objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
                         print(objectMap)
-                        print("Karten und StartGameCmd empfangen")
+                        print("Karten und GameStartedEvt empfangen")
+                        waitingForPlayerOne = False
                     else:
-                        print("kein StartGameCmd")
-                        print(data["payload"])
+                        print("kein GameStartedEvt")
+                        print(data)
                 time.sleep(1)
     #offline
     else:
@@ -237,13 +238,15 @@ def startGame():
                     print("Warte auf Befehl vom Server")
                     data = sv.read()
                     if data != None:
-                        if "type" in data and data["type"] == "CommandCmd":
-                            order = data["payload"]
+                        if "type" in data and data["type"] == "RoundEndEvt":
+                            for o in data["payload"]["commands"]:
+                                if o["player"] != playerName:
+                                    order = o
                             receivedOrders = True
                             print(order)
                             print("Befehl erhalten")
                         else:
-                            print("Kein CommandCmd")
+                            print("Kein RoundEndEvt")
                             print(data["payload"])
                     time.sleep(1)
                 if order != None:
