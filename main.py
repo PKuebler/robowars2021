@@ -104,7 +104,7 @@ def startGame():
     # Host oder nicht?
     host = True
     playerOneTurn = True
-    twoLocalPlayers = False
+    twoLocalPlayers = True
     twoLocalPlayersPlayerOne = True
     # wenn host: karte generieren
     if host:
@@ -132,6 +132,8 @@ def startGame():
                 if twoLocalPlayers:
                     if twoLocalPlayersPlayerOne:
                         twoLocalPlayersPlayerOne = False
+                    else:
+                        playerTurn = False
                 else:
                     # sendOrderToServer(order)
                     playerTurn = False

@@ -17,8 +17,6 @@ def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
             if objectMap[target_x][target_y] == None:
                 #order erzeugen
                 order = playerRobot.move(target_x, target_y, terrainMap, objectMap)
-                #ascii
-                visualize(terrainMap, objectMap)
     return order
 
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap):
@@ -35,9 +33,12 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
             #aktiver roboter
             if playerOne:
                 playerRobot = playerOneRobot
+                print("sollte 1 sein")
+                print(playerRobot.player)
             else:
                 playerRobot = playerTwoRobot
-
+                print("sollte 2 sein")
+                print(playerRobot.player)
             #bewegen
             if moveMode:
                 #oben
@@ -64,18 +65,26 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     return playerTurn, moveMode, order
 
 def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
+    print("execute")
+    print(orders)
+
     #TODO
     #nicht vergessen: beide Spieler gehen aufs gleiche feld
     for order in orders:
+        #roboter wählen
+        if order["player_nr"] == 1:
+            playerRobot = playerOneRobot
+        else:
+            playerRobot = playerTwoRobot
         #ordertyp
         if order["ordertype"] == "move":
             #spieler
-            if order["player_nr"] == 1:
-                print("moving")
-                #bewegung ausführen über objekt
-                playerOneRobot.executeMove(terrainMap, objectMap)
+            print("moving")
+            #bewegung ausführen über objekt
+            playerRobot.executeMove(terrainMap, objectMap)
     visualize(terrainMap, objectMap)
     playerOneRobot.initNewRound()
+    playerTwoRobot.initNewRound()
 
 def visualize(terrainMap, objectMap):
     print('**********')
