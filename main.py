@@ -3,9 +3,11 @@ from pygame.locals import *
 import sys
 import pygame_gui
 import initializeGame
-from objects import *
+#from objects import *
 import gameLogic
 import random
+from client import *
+import time
 
 MAPSIZE = 10
 
@@ -23,12 +25,12 @@ def gameWindowInitialisation():
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
-    # initialisiert das gamemap array
+    #initialisiert das gamemap array
     global map_data
     map_data = [[[] for i in range(10)] for i in range(10)]
     for i, row in enumerate(map_data):
         for j, tile in enumerate(row):
-            map_data[i][j] = random.randint(0, 2)  # füttert die map mit random terraintypen
+            map_data[i][j] = random.randint(0, 2) # füttert die map mit random terraintypen
 
     # ladet die bildaten
     global wall, grass, ice, underGround
@@ -36,7 +38,6 @@ def graphicsInitialisation():
     grass = pygame.image.load('grass.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
     underGround = pygame.image.load('underGround.png').convert_alpha()
-
 
 # rendert den Hintergrund
 def renderBackground():
@@ -69,7 +70,7 @@ def renderBackground():
 
 # rendert das Spiel
 def renderGameObjects():
-    pass  # sollte ähnlich funktionieren wie bei renderBackground()
+    pass
 
 
 def renderGUI():
@@ -143,20 +144,46 @@ def startGame():
     moveMode: wenn True, bewegungsbefehl ausführen, sonst angriffsbefehl - ggf. später noch um angriffsart erweitern
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
-
+    #für Server
+    playerName = "Lars"
+    sessionId = 12345
     # Host oder nicht?
     host = True
     playerOneTurn = True
     twoLocalPlayers = True
     twoLocalPlayersPlayerOne = True
-    # wenn host: karte generieren
-    if host:
-        # beide Kartenlayer
-        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-        # sendMapsToServer(terrainMap, objectMap)
+    #online?
+    if not twoLocalPlayers:
+        sv = Client("pkuebler.de", 3210)
+        sv.connect(playerName)
+        sv.join(sessionId)
+        # wenn host: karte generieren
+        if host:
+            terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
+            jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
+            waitingForPlayerTwo = True
+            while waitingForPlayerTwo:
+                data = sv.read()
+                if data != None and "type" in data:
+                    if data["type"] == "PlayerConnectEvt":
+                        if data["payload"]["name"] != playerName:
+                            sv.startGame(terrainMap, jsonObjMap, 60)
+                            waitingForPlayerTwo = False
+                        else:
+                            print(data["payload"])
+                time.sleep(1)
+        else:
+            waitingForPlayerOne = True
+            while waitingForPlayerOne:
+                data = sv.read()
+                if data != None and "StartGameCmd" in data:
+                    terrainMap = data["terrain"]
+                    objMapJson = data["map"]
+                    objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson)
+                time.sleep(1)
+    #offline
     else:
-        pass
-        # receiveMapsFromServer(terrainMap, objectMap)
+        terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
 
     # Variablen zum Start
     playerTurn = True
@@ -182,32 +209,38 @@ def startGame():
                     else:
                         playerTurn = False
                 else:
-                    # sendOrderToServer(order)
+                    #order an server senden
+                    sv.command(order)
                     playerTurn = False
                 orders.append(order)
 
-        # Spieler ist nicht am Zug: Warten auf Antwort vom server
+        # Spieler ist nicht am Zug
         if not playerTurn:
+            #local: beide Befehle liegen vor
             if twoLocalPlayers:
                 twoLocalPlayersPlayerOne = True
+            #online: Warten auf Antwort vom server
             else:
-                #erstmal überspringen
-                pass
-                """
                 receivedOrders = False
                 while not receivedOrders:
-                    order = receiveOrderFromServer()
-                    if order != None:
-                        orders.append(order)
-                        receivedOrders = True
-                    else:
-                        time.sleep(1)"""
+                    data = sv.read()
+                    if data != None and "type" in data:
+                        if data["type"] == "CommandCmd":
+                            order = data["payload"]
+                            receivedOrders = True
+                        else:
+                            print(data["payload"])
+                    time.sleep(1)
+                if order != None:
+                    orders.append(order)
+                    receivedOrders = True
+                else:
+                    time.sleep(1)
             #wenn order vom server empfangen:
             gameLogic.executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #prüfen ob zuende
             #sonst spielerzug wieder starten
             playerTurn = True
-
             orders = []
 
         renderBackground()
