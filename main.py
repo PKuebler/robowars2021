@@ -99,24 +99,24 @@ def startGame():
     # GameLoop
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            # Spieler ist am Zug
-
-            elif playerTurn:
-                # Aktion auswerten
-                playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne,
+            # Aktion auswerten
+            playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, playerOne,
                                                                      playerOneRobot, playerTwoRobot, terrainMap,
                                                                      objectMap)
-                if order != None:
-                    pass
-                    # sendOrderToServer(order)
-                    playerTurn = False
-        # Spieler ist nicht am Zug: Warten auf Antwort
+            #wenn korrektes event wurde befehl erzeugt: spielzug endet
+            if order != None:
+                # sendOrderToServer(order)
+                playerTurn = False
+        # Spieler ist nicht am Zug: Warten auf Antwort vom server
         if not playerTurn:
             # receiveOrderFromServer()
             # time.sleep(1)
-            pass
+            #wenn order vom server empfangen:
+            #ausführen aller order (in gameLogic.executeOrders(orders))
+            #prüfen ob zuende
+            #sonst spielerzug wieder starten
+            playerTurn = True
+
         renderGame()
         renderGUI(event)
         pygame.display.update()
