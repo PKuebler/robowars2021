@@ -19,8 +19,3 @@ func main() {
 
 // todo:
 // - add timer / command logic
-// - add disconnect event
-// - client -> current room mutex
-// - room -> command and clients mutex
-// - hub -> rooms
-// - delete room if empty
