@@ -79,12 +79,14 @@ type LeaveCmd struct {
 
 // StartGameCmd define the map and round seconds on server
 type StartGameCmd struct {
+	Terrain      json.RawMessage `json:"terrain"`
 	Map          json.RawMessage `json:"map"`
 	RoundSeconds int             `json:"round_seconds"`
 }
 
 // GameStartedEvt sned the map and round timer to clients
 type GameStartedEvt struct {
+	Terrain      json.RawMessage `json:"terrain"`
 	Map          json.RawMessage `json:"map"`
 	RoundSeconds int             `json:"round_seconds"`
 	Players      []string        `json:"players"`
