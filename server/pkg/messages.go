@@ -96,17 +96,19 @@ type GameStartedEvt struct {
 
 // CommandCmd send a robot command to the server
 type CommandCmd struct {
-	Type    string `json:"type"`
-	TargetX int    `json:"target_x"`
-	TargetY int    `json:"target_y"`
+	Type     string `json:"ordertype"`
+	TargetX  int    `json:"x"`
+	TargetY  int    `json:"y"`
+	PlayerNr int    `json:"player_nr"`
 }
 
 // CommandEvt round command to move the robot
 type CommandEvt struct {
-	Player  string `json:"player"`
-	Type    string `json:"type"`
-	TargetX int    `json:"target_x"`
-	TargetY int    `json:"target_y"`
+	Player   string `json:"player"`
+	Type     string `json:"ordertype"`
+	TargetX  int    `json:"x"`
+	TargetY  int    `json:"y"`
+	PlayerNr int    `json:"player_nr"`
 }
 
 // RoundEndEvt send if all clients add a command or round timeout

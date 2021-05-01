@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"net"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -10,6 +11,7 @@ type Hub struct {
 	log *logrus.Entry
 
 	rooms    map[string]*Room
+	lock     sync.RWMutex
 	register chan Client
 }
 
@@ -24,6 +26,9 @@ func NewHub(log *logrus.Entry) *Hub {
 
 func (h *Hub) Join(client Client, cmd *JoinCmd) {
 	// is room empty?
+	h.lock.Lock()
+	defer h.lock.Unlock()
+
 	for roomCode, room := range h.rooms {
 		if roomCode == DefaultRoomName {
 			continue
@@ -48,6 +53,9 @@ func (h *Hub) Join(client Client, cmd *JoinCmd) {
 
 func (h *Hub) run() {
 	h.rooms[DefaultRoomName] = NewRoom(DefaultRoomName, h.log)
+
+	h.lock.RLock()
+	defer h.lock.RUnlock()
 
 	for {
 		client := <-h.register
