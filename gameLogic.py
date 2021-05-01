@@ -103,15 +103,20 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             playerRobot = playerOneRobot
         else:
             playerRobot = playerTwoRobot
+
+        pygame.mixer.init()
+
         #ordertyp
         #bewegung
         if order["ordertype"] == "move":
             print("moving")
+            pygame.mixer.music.load("204431__jaraxe__robot-walk.ogg")
             #bewegung ausführen über objekt
             playerRobot.executeMove(terrainMap, objectMap, order["x"], order["y"])
         #action_1
         elif order["ordertype"] == "action_1":
             print("action_1")
+            pygame.mixer.music.load("517939__slopemstr__laser-artillery-sound-effect.ogg")
             playerRobot.action_1(order["x"], order["y"], terrainMap, objectMap)
         #action2
         elif order["ordertype"] == "action_2":
@@ -120,6 +125,9 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     visualize(terrainMap, objectMap)
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()
+
+    pygame.mixer.music.play()
+
 
 def checkIfOver(playerOneRobot, playerTwoRobot):
     if playerOneRobot.health <= 0 and playerTwoRobot.health <= 0:
