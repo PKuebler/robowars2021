@@ -112,7 +112,7 @@ def renderGameObjects(objectMap):
             if tile == None:
                 continue
 
-            iso = mapToScreen(tile.x-1, tile.y-1)
+            iso = mapToScreen(tile.x, tile.y)
 
             if tile.obtype == "robot1":
                 image = robot
