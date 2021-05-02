@@ -189,10 +189,9 @@ def startGame():
     gameWindowInitialisation()
     graphicsInitialisation()
     guiInitialisation()
-    #mixer = pygame.mixer.init()
     soundMusic = pygame.mixer.Sound('mechanoid.wav')
     soundMusic.play(-1)
-    soundMusic.set_volume(0.1)
+    soundMusic.set_volume(0.3)
 
     roboto1 = pygame.image.load('robot1.png')
     roboto1_mask = pygame.mask.from_surface(roboto1, 50)
