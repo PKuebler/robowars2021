@@ -295,11 +295,11 @@ def startGame():
 
 
             if event.type == MOUSEMOTION:
-                tile = tileOnPos(event.pos[0], event.pos[1], objectMap)
+                tile = tileOnPos(event.pos[0], event.pos[1], terrainMap)
 
                 if tile != None:
                     hoverTile = tile
-                    #print(("hit", tile.x, tile.y))
+                    print(("hit", tile.x, tile.y))
                 else:
                     hoverTile = None
 

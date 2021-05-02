@@ -32,7 +32,16 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     if event.type == pygame.QUIT:
         sys.exit()
     elif event.type == pygame.MOUSEBUTTONUP:
-        print(hoverTile.x, hoverTile.y)
+        if hoverTile != None:
+            print(hoverTile.x, hoverTile.y)
+        if playerTurn:
+            #spielfigur festlegen
+            if playerOne:
+                playerRobot = playerOneRobot
+            else:
+                playerRobot = playerTwoRobot
+        #print(bu.key)
+
     #Tastatur auswerten
     elif event.type == pygame.KEYUP:
         #ist der Spieler am Zug?
@@ -40,12 +49,8 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
             #aktiver roboter
             if playerOne:
                 playerRobot = playerOneRobot
-                #print("sollte 1 sein")
-                #print(playerRobot.player)
             else:
                 playerRobot = playerTwoRobot
-                #print("sollte 2 sein")
-                #print(playerRobot.player)
             #modus umschalten
             if event.key == pygame.K_SPACE:
                 moveMode = not moveMode
