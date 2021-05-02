@@ -17,7 +17,10 @@ def createTerrainMap(SIZE):
         ylist = []
         for y in range(SIZE):
             # an dieser Stelle Zufallsgenerator fuer Karten
-            tileinfo = Object("grass", "grass", 1, x, y)
+            obtype = "grass"
+            if random.randint(0, 10) == 0:
+                obtype = "water"
+            tileinfo = Object(obtype, obtype, 1, x, y)
             ylist.append(tileinfo)
         list2d.append(ylist)
     return list2d
