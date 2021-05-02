@@ -52,7 +52,7 @@ def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
     if target_x >= 0 and target_x < SIZE and target_y >= 0 and target_y < SIZE:
         playerRobot.setTarget(target_x, target_y)
 
-def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap, hoverTile, host):
+def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap, hoverTile, host, twoLocalPlayers):
     order = None
     withinWalkingDistance = False
 
@@ -61,7 +61,7 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
 
     #spielfigur und cursor festlegen
     if playerTurn:
-        playerRobot = returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot, playerOne, host)
+        playerRobot = returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot, host, twoLocalPlayers)
         """if moveMode and hoverTile != None:
             moveDist = abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y)
             if moveDist > 0 and moveDist <= playerRobot.steps and objectMap[hoverTile.x][hoverTile.y] == None:
