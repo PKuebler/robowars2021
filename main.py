@@ -58,7 +58,7 @@ def mapToScreen(mapX, mapY):
 
     return (screenX, screenY)
 
-def screenToMap(screenX, screenY):    
+def screenToMap(screenX, screenY):
     CAMERA_X = screenSurfcace.get_rect().width / 2
     CAMERA_Y = 64 #screenSurfcace.get_rect().height / 4 + 64
 
@@ -234,6 +234,7 @@ def startGame():
         if host:
             terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
             jsonObjMap = initializeGame.returnObjMapWithDicts(objectMap, MAPSIZE)
+            jsonTerrMap = initializeGame.returnObjMapWithDicts(terrainMap, MAPSIZE)
             waitingForPlayerTwo = True
             while waitingForPlayerTwo:
                 for event in pygame.event.get():
@@ -244,7 +245,7 @@ def startGame():
                     if "type" in data and data["type"] == "PlayerConnectEvt":
                         if data["payload"]["name"] != playerName:
                             print(data["payload"]["name"] + " joined")
-                            sv.startGame(terrainMap, jsonObjMap, 60)
+                            sv.startGame(jsonTerrMap, jsonObjMap, 60)
                             print("StartGameCmd gesendet")
                             waitingForPlayerTwo = False
                         else:
@@ -260,9 +261,10 @@ def startGame():
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "GameStartedEvt":
-                        terrainMap = data["payload"]["terrain"]
-                        objMapJson = data["payload"]["map"]
-                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(objMapJson, MAPSIZE)
+                        jsonTerrMap = data["payload"]["terrain"]
+                        jsonObjMap = data["payload"]["map"]
+                        terrainMap = initializeGame.createMapWithObjFromJson(jsonTerrMap, MAPSIZE)
+                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(jsonObjMap, MAPSIZE)
                         print(objectMap)
                         print("Karten und GameStartedEvt empfangen")
                         waitingForPlayerOne = False
@@ -295,7 +297,7 @@ def startGame():
 
                 if tile != None:
                     hoverTile = tile
-                    print(("hit", tile))
+                    print(("hit", tile.x, tile.y))
                 else:
                     hoverTile = None
 
