@@ -37,14 +37,18 @@ def graphicsInitialisation():
             map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
-    global wall, robot1, robot2, grass, ice, underGround, hoverGround
+    global wall, robot1, robot2, grass, water, ice, underGround, hoverGround, healthbar, healthstatus, selectedCursor
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('test8060.png').convert_alpha()
+    water = pygame.image.load('test8060water.png').convert_alpha()
     wall = pygame.image.load('test80Object.png').convert_alpha()
     robot1 = pygame.image.load('test80robot1.png').convert_alpha()
     robot2 = pygame.image.load('test80robot2.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
     hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
+    healthbar = pygame.image.load('healthbar.png').convert_alpha()
+    healthstatus = pygame.image.load('healthstatus.png').convert_alpha()
+    selectedCursor = pygame.image.load('test80Cursor.png').convert_alpha()
 
 TILE_WIDTH = 80 # 128
 TILE_HEIGHT = 40 # 64
@@ -89,7 +93,7 @@ def tileOnPos(screenX, screenY, tileMap):
     return tile
 
 # rendert den Hintergrund
-def renderBackground(terrainMap, hoverTile):
+def renderBackground(terrainMap, hoverTile, playerRobot):
     night = 16, 17, 18
     screenSurfcace.fill(night)
 
@@ -99,11 +103,21 @@ def renderBackground(terrainMap, hoverTile):
     for row_i, row_item in enumerate(terrainMap):  # for every row_item of the map. row_i = index of loop
         for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
             iso = mapToScreen(row_i, col_i)
-            screenSurfcace.blit(grass, (iso[0], iso[1]))  # display the actual tile
+
+            if tile.obtype == "water":
+                image = water
+            else:
+                image = grass
+
+            screenSurfcace.blit(image, (iso[0], iso[1]))  # display the actual tile
 
     if hoverTile != None:
         screen = mapToScreen(hoverTile.x, hoverTile.y)
         screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
+    
+    if playerRobot != None:
+        screen = mapToScreen(playerRobot.x, playerRobot.y)
+        screenSurfcace.blit(selectedCursor, (screen[0], screen[1]))
 
 # renders GameObjects
 def renderGameObjects(objectMap):
@@ -126,6 +140,10 @@ def renderGameObjects(objectMap):
 
             screenSurfcace.blit(image, (iso[0], iso[1]-10))  # display the actual tile
 
+            if tile.health != tile.maxhealth:
+                screenSurfcace.blit(healthbar, (iso[0]+15, iso[1]-10))
+                for i in range(tile.health):
+                    screenSurfcace.blit(healthstatus, (iso[0]+15+3+i*9, iso[1]-10+3))
     pass
 
 
@@ -279,17 +297,19 @@ def startGame():
 
         global time_delta
         time_delta = clock.tick(60) / 1000.0
+
+        #aktiver Roboter
+        playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot)
+        #events abarbeiten
         for event in pygame.event.get():
             checkForGuiEvents(event, playerOne)
             ui_manager.process_events(event)
-
-
+            #tile unter der Maus
             if event.type == MOUSEMOTION:
                 tile = tileOnPos(event.pos[0], event.pos[1], terrainMap)
-
                 if tile != None:
                     hoverTile = tile
-                    print(("hit", tile.x, tile.y))
+                    #print(("hit", tile.x, tile.y))
                 else:
                     hoverTile = None
 
@@ -357,7 +377,7 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        renderBackground(terrainMap, hoverTile)
+        renderBackground(terrainMap, hoverTile, playerRobot)
         renderGameObjects(objectMap)
         renderGUI()
         pygame.display.flip()
