@@ -39,8 +39,8 @@ def createObjectMap(SIZE):
     # remove blocking objects
     list2d = removeBrockingObjects(list2d, SIZE)
     # start der 2 spieler
-    list2d[4][1] = Object("Roboter von Spieler 1", "robot1", 10, 4, 1, 1, 2)
-    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 10, 5, 8, 2, 1)
+    list2d[4][1] = Object("Roboter von Spieler 1", "robot1", 5, 4, 1, 1, 1)
+    list2d[5][8] = Object("Roboter von Spieler 2", "robot1", 5, 5, 8, 2, 1)
     return list2d, list2d[4][1], list2d[5][8]
 
 def returnObjMapWithDicts(objectMap, SIZE):
