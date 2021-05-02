@@ -60,6 +60,7 @@ func (r *Room) Start(client Client, cmd *StartGameCmd) {
 	r.roundSeconds = cmd.RoundSeconds
 
 	payload, _ := json.Marshal(GameStartedEvt{
+		Terrain:      cmd.Terrain,
 		Map:          cmd.Map,
 		RoundSeconds: cmd.RoundSeconds,
 		Players:      players,
