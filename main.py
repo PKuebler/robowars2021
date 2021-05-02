@@ -6,6 +6,7 @@ import initializeGame
 import objects
 import gameLogic
 import random
+import math
 from client import *
 import time
 
@@ -36,7 +37,7 @@ def graphicsInitialisation():
     # ladet die bildaten
     global wall, robot, grass, ice, underGround, hoverGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
-    grass = pygame.image.load('test80.png').convert_alpha()
+    grass = pygame.image.load('test8060.png').convert_alpha()
     wall = pygame.image.load('house1.png').convert_alpha()
     robot = pygame.image.load('robot1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
@@ -45,11 +46,11 @@ def graphicsInitialisation():
 TILE_WIDTH = 80 # 128
 TILE_HEIGHT = 40 # 64
 TILE_WIDTH_HALF = TILE_WIDTH / 2
-TILE_HEIGHT_HALF = TILE_HEIGHT / 2
+TILE_HEIGHT_HALF = TILE_HEIGHT / 1.333
 
 def mapToScreen(mapX, mapY):
     CAMERA_X = screenSurfcace.get_rect().width / 2
-    CAMERA_Y = screenSurfcace.get_rect().height / 4 + 64
+    CAMERA_Y = 64 #screenSurfcace.get_rect().height / 4 + 64
 
     screenX = (mapX - mapY) * TILE_WIDTH_HALF + CAMERA_X
     screenY = (mapX + mapY) * TILE_HEIGHT_HALF + CAMERA_Y
@@ -58,7 +59,7 @@ def mapToScreen(mapX, mapY):
 
 def screenToMap(screenX, screenY):    
     CAMERA_X = screenSurfcace.get_rect().width / 2
-    CAMERA_Y = screenSurfcace.get_rect().height / 4 + 64
+    CAMERA_Y = 64 #screenSurfcace.get_rect().height / 4 + 64
 
     screenX = screenX - CAMERA_X
     screenY = screenY - CAMERA_Y
@@ -91,8 +92,6 @@ def renderBackground(terrainMap, hoverTile):
 
     if terrainMap == None:
         return
-
-    screenSurfcace.blit(underGround, (-2, -32))  # display the actual tile
 
     for row_i, row_item in enumerate(terrainMap):  # for every row_item of the map. row_i = index of loop
         for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
