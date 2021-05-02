@@ -5,6 +5,14 @@ import sys
 
 SIZE = 10
 
+def returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot):
+    if playerTurn:
+        if playerOne:
+            return playerOneRobot
+        else:
+            return playerTwoRobot
+    return None
+
 def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
     order = None
     #noch schritte?
@@ -35,10 +43,7 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
 
     #spielfigur und cursor festlegen
     if playerTurn:
-        if playerOne:
-            playerRobot = playerOneRobot
-        else:
-            playerRobot = playerTwoRobot
+        playerRobot = returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot)
         if moveMode and hoverTile != None:
             moveDist = abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y)
             if moveDist > 0 and moveDist <= playerRobot.steps and objectMap[hoverTile.x][hoverTile.y] == None:
