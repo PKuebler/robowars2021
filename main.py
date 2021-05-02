@@ -114,7 +114,7 @@ def renderBackground(terrainMap, hoverTile, playerRobot):
     if hoverTile != None:
         screen = mapToScreen(hoverTile.x, hoverTile.y)
         screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
-    
+
     if playerRobot != None:
         screen = mapToScreen(playerRobot.x, playerRobot.y)
         screenSurfcace.blit(selectedCursor, (screen[0], screen[1]))
@@ -278,7 +278,7 @@ def startGame():
                     if "type" in data and data["type"] == "GameStartedEvt":
                         jsonTerrMap = data["payload"]["terrain"]
                         jsonObjMap = data["payload"]["map"]
-                        terrainMap = initializeGame.createMapWithObjFromJson(jsonTerrMap, MAPSIZE)
+                        terrainMap = initializeGame.createMapWithObjFromJson(jsonTerrMap, MAPSIZE)[0]
                         objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(
                             jsonObjMap, MAPSIZE)
                         print(objectMap)
