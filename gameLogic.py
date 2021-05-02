@@ -28,84 +28,91 @@ def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
 
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap, hoverTile):
     order = None
+    withinWalkingDistance = False
 
+    if event.type == pygame.QUIT:
+        sys.exit()
+
+    #spielfigur und cursor festlegen
     if playerTurn:
-        #spielfigur festlegen
         if playerOne:
             playerRobot = playerOneRobot
         else:
             playerRobot = playerTwoRobot
-        if moveMode:
-            if hoverTile != None and abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y) <= 1:
+        if moveMode and hoverTile != None:
+            moveDist = abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y)
+            if moveDist > 0 and moveDist <= playerRobot.steps and objectMap[hoverTile.x][hoverTile.y] == None:
+                withinWalkingDistance = True
                 pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
             else:
                 pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
+        else:
+            pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
     else:
         pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
+        return playerTurn, moveMode, order
 
-
-
-    if event.type == pygame.QUIT:
-        sys.exit()
-    elif event.type == pygame.MOUSEBUTTONUP:
+    #Maussteuerung
+    if event.type == pygame.MOUSEBUTTONUP:
         if hoverTile != None:
             print(hoverTile.x, hoverTile.y)
+            if moveMode:
+                order = playerRobot.mouseMove(hoverTile.x, hoverTile.y, objectMap)
+                print(order)
         #print(bu.key)
 
     #Tastatur auswerten
     elif event.type == pygame.KEYUP:
-        #ist der Spieler am Zug?
-        if playerTurn:
-            ##aktiver roboter
-            #if playerOne:
-            #    playerRobot = playerOneRobot
-            #else:
-            #    playerRobot = playerTwoRobot
-            #modus umschalten
-            if event.key == pygame.K_SPACE:
-                moveMode = not moveMode
-                if not moveMode:
-                    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
-                print("movemode: " + str(moveMode))
-            #feuerbefehl
-            elif event.key == pygame.K_RETURN and not moveMode:
-                if playerRobot.shootAtX != playerRobot.x or playerRobot.shootAtY != playerRobot.y:
-                    print("shoot (action_1)")
-                    order = {"ordertype": "action_1", "x": playerRobot.shootAtX, "y": playerRobot.shootAtY, "player_nr": playerRobot.player}
-            #feuer action 2 aoe
-            elif event.key == pygame.K_BACKSPACE and not moveMode:
-                if playerRobot.shootAtX != playerRobot.x or playerRobot.shootAtY != playerRobot.y:
-                    print("shoot (action_2)")
-                    order = {"ordertype": "action_2", "x": playerRobot.shootAtX, "y": playerRobot.shootAtY, "player_nr": playerRobot.player}
-            #bewegen
-            else:
-                #oben
-                input_valid = False
-                if event.key == pygame.K_UP:
-                    #spieler 1 + nicht am rand + nicht schritte verbraucht
-                    offset_x = 0
-                    offset_y = -1
-                    input_valid = True
-                #unten
-                elif event.key == pygame.K_DOWN:
-                    offset_x = 0
-                    offset_y = 1
-                    input_valid = True
-                #links
-                elif event.key == pygame.K_LEFT:
-                    offset_x = -1
-                    offset_y = 0
-                    input_valid = True
-                #rechts
-                elif event.key == pygame.K_RIGHT:
-                    offset_x = 1
-                    offset_y = 0
-                    input_valid = True
-                if input_valid:
-                    if moveMode:
-                        order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
-                    else:
-                        changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+        ##aktiver roboter
+        #if playerOne:
+        #    playerRobot = playerOneRobot
+        #else:
+        #    playerRobot = playerTwoRobot
+        #modus umschalten
+        if event.key == pygame.K_SPACE:
+            moveMode = not moveMode
+            if not moveMode:
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+            print("movemode: " + str(moveMode))
+        #feuerbefehl
+        elif event.key == pygame.K_RETURN and not moveMode:
+            if playerRobot.shootAtX != playerRobot.x or playerRobot.shootAtY != playerRobot.y:
+                print("shoot (action_1)")
+                order = {"ordertype": "action_1", "x": playerRobot.shootAtX, "y": playerRobot.shootAtY, "player_nr": playerRobot.player}
+        #feuer action 2 aoe
+        elif event.key == pygame.K_BACKSPACE and not moveMode:
+            if playerRobot.shootAtX != playerRobot.x or playerRobot.shootAtY != playerRobot.y:
+                print("shoot (action_2)")
+                order = {"ordertype": "action_2", "x": playerRobot.shootAtX, "y": playerRobot.shootAtY, "player_nr": playerRobot.player}
+        #bewegen
+        else:
+            #oben
+            input_valid = False
+            if event.key == pygame.K_UP:
+                #spieler 1 + nicht am rand + nicht schritte verbraucht
+                offset_x = 0
+                offset_y = -1
+                input_valid = True
+            #unten
+            elif event.key == pygame.K_DOWN:
+                offset_x = 0
+                offset_y = 1
+                input_valid = True
+            #links
+            elif event.key == pygame.K_LEFT:
+                offset_x = -1
+                offset_y = 0
+                input_valid = True
+            #rechts
+            elif event.key == pygame.K_RIGHT:
+                offset_x = 1
+                offset_y = 0
+                input_valid = True
+            if input_valid:
+                if moveMode:
+                    order = move(playerRobot, offset_x, offset_y, terrainMap, objectMap)
+                else:
+                    changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
 def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):

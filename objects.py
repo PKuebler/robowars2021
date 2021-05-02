@@ -59,14 +59,14 @@ class Object:
 
         def action_1(self, targetX, targetY, terrainMap, objectMap):
             #basic shooting attack
-            BASE_DMG = 5
+            BASE_DMG = 3
             if objectMap[targetX][targetY] != None:
                 objectMap[targetX][targetY].changeHealth(BASE_DMG)
                 print("treffer bei " + objectMap[targetX][targetY].name)
 
         def action_2(self, targetX, targetY, terrainMap, objectMap):
             #aoe shooting attack
-            BASE_DMG = 2
+            BASE_DMG = 1
             for x in range(-1,2):
                 for y in range(-1,2):
                     if targetX+x >= 0 and targetY+y >= 0 and targetX+x < 10 and targetY+y < 10:
@@ -74,11 +74,19 @@ class Object:
                             objectMap[targetX+x][targetY+y].changeHealth(BASE_DMG)
                             print("treffer bei " + objectMap[targetX+x][targetY+y].name)
 
-        def shoot(self, targetX, targetY, terrainMap, objectMap):
-            pass
-
         def melee(self, targetX, targetY, terrainMap, objectMap):
             pass
+
+        def mouseMove(self, targetX, targetY, objectMap):
+            if objectMap[targetX][targetY] != None:
+                print("object map belegt mit ",objectMap[targetX][targetY])
+                return None
+            if self.steps > 0:
+                self.steps -= 1
+                return {"ordertype": "move", "x": targetX, "y": targetY, "player_nr": self.player}
+            else:
+                print("steps", self.steps)
+                return None
 
         def move(self, targetX, targetY, terrainMap, objectMap):
             print("move")
