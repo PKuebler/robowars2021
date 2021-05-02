@@ -28,32 +28,44 @@ def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
 
 def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap, hoverTile):
     order = None
-    #Mausklick auswerten
+
+    if playerTurn:
+        #spielfigur festlegen
+        if playerOne:
+            playerRobot = playerOneRobot
+        else:
+            playerRobot = playerTwoRobot
+        if moveMode:
+            if hoverTile != None and abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y) <= 1:
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            else:
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
+    else:
+        pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
+
+
+
     if event.type == pygame.QUIT:
         sys.exit()
     elif event.type == pygame.MOUSEBUTTONUP:
         if hoverTile != None:
             print(hoverTile.x, hoverTile.y)
-        if playerTurn:
-            #spielfigur festlegen
-            if playerOne:
-                playerRobot = playerOneRobot
-            else:
-                playerRobot = playerTwoRobot
         #print(bu.key)
 
     #Tastatur auswerten
     elif event.type == pygame.KEYUP:
         #ist der Spieler am Zug?
         if playerTurn:
-            #aktiver roboter
-            if playerOne:
-                playerRobot = playerOneRobot
-            else:
-                playerRobot = playerTwoRobot
+            ##aktiver roboter
+            #if playerOne:
+            #    playerRobot = playerOneRobot
+            #else:
+            #    playerRobot = playerTwoRobot
             #modus umschalten
             if event.key == pygame.K_SPACE:
                 moveMode = not moveMode
+                if not moveMode:
+                    pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
                 print("movemode: " + str(moveMode))
             #feuerbefehl
             elif event.key == pygame.K_RETURN and not moveMode:
@@ -100,7 +112,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     print("execute")
     print(orders)
 
-    pygame.mixer.init()
+    #pygame.mixer.init()
 
     #beide Spieler gehen aufs gleiche feld
     if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"]:
