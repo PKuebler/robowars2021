@@ -147,7 +147,7 @@ def renderGameObjects(objectMap):
     pass
 
 
-def renderGUI():
+def renderGUI(time_delta):
     ui_manager.update(time_delta)
     ui_manager.draw_ui(screenSurfcace)
 
@@ -177,7 +177,7 @@ def guiInitialisation():
                                                  manager=ui_manager)
 
 
-def checkForGuiEvents(event, playerOne):
+def checkForGuiEvents(event, playerOne, nameIsSet):
     if event.type == pygame.USEREVENT:
         if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == connectButton:
@@ -230,8 +230,13 @@ def startGame():
     playerOne = player.Player("TestName", "1234")
 
     print("starte GUI-Credential Loop")
-    while nameIsSet:
-        pass
+    # while nameIsSet == False:
+    #     time_delta = clock.tick(60) / 1000.0
+    #     for event in pygame.event.get():
+    #         checkForGuiEvents(event, playerOne, nameIsSet)
+    #         ui_manager.process_events(event)
+    #     renderGUI(time_delta)
+    #     pygame.display.flip()
 
     print("starte Gameloop")
 
@@ -293,17 +298,12 @@ def startGame():
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
     # GameLoop
     while True:
-
-
-        global time_delta
         time_delta = clock.tick(60) / 1000.0
 
         #aktiver Roboter
         playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot)
         #events abarbeiten
         for event in pygame.event.get():
-            checkForGuiEvents(event, playerOne)
-            ui_manager.process_events(event)
             #tile unter der Maus
             if event.type == MOUSEMOTION:
                 tile = tileOnPos(event.pos[0], event.pos[1], terrainMap)
@@ -379,7 +379,6 @@ def startGame():
 
         renderBackground(terrainMap, hoverTile, playerRobot)
         renderGameObjects(objectMap)
-        renderGUI()
         pygame.display.flip()
 
 
