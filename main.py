@@ -35,7 +35,7 @@ def graphicsInitialisation():
             map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
-    global wall, robot1, robot2, grass, ice, underGround, hoverGround
+    global wall, robot1, robot2, grass, ice, underGround, hoverGround, healthbar, healthstatus
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('test8060.png').convert_alpha()
     wall = pygame.image.load('test80Object.png').convert_alpha()
@@ -43,6 +43,8 @@ def graphicsInitialisation():
     robot2 = pygame.image.load('test80robot2.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
     hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
+    healthbar = pygame.image.load('healthbar.png').convert_alpha()
+    healthstatus = pygame.image.load('healthstatus.png').convert_alpha()
 
 TILE_WIDTH = 80 # 128
 TILE_HEIGHT = 40 # 64
@@ -124,6 +126,10 @@ def renderGameObjects(objectMap):
 
             screenSurfcace.blit(image, (iso[0], iso[1]-10))  # display the actual tile
 
+            if tile.health != tile.maxhealth:
+                screenSurfcace.blit(healthbar, (iso[0]+15, iso[1]-10))
+                for i in range(tile.health):
+                    screenSurfcace.blit(healthstatus, (iso[0]+15+3+i*9, iso[1]-10+3))
     pass
 
 
