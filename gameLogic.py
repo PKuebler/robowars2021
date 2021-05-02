@@ -96,11 +96,11 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                         changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap)
     return playerTurn, moveMode, order
 
-def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
+def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot, pymixer):
     print("execute")
     print(orders)
 
-    pygame.mixer.init()
+    ###pygame.mixer.init()
 
     #beide Spieler gehen aufs gleiche feld
     if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"]:
@@ -122,8 +122,8 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         #bewegung
         if order["ordertype"] == "move":
             print("moving")
-            #pygame.mixer.music.load("204431__jaraxe__robot-walk.ogg")
-            pygame.mixer.Channel(0).play(pygame.mixer.Sound("204431__jaraxe__robot-walk.ogg"))
+            pymixer.play(pygame.mixer.Sound("204431__jaraxe__robot-walk.ogg"))
+            #pygame.mixer.play(pygame.mixer.Sound("204431__jaraxe__robot-walk.ogg"))
             #bewegung ausführen über objekt
             playerRobot.executeMove(terrainMap, objectMap, order["x"], order["y"])
 
@@ -136,13 +136,13 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         #action_1
         if order["ordertype"] == "action_1":
             print("action_1")
-            pygame.mixer.Channel(1).play(pygame.mixer.Sound("517939__slopemstr__laser-artillery-sound-effect.ogg"))
+            pymixer.play(pygame.mixer.Sound("517939__slopemstr__laser-artillery-sound-effect.ogg"))
             playerRobot.action_1(order["x"], order["y"], terrainMap, objectMap)
         #action2
         elif order["ordertype"] == "action_2":
             print("action_2")
             playerRobot.action_2(order["x"], order["y"], terrainMap, objectMap)
-            pygame.mixer.Channel(1).play(pygame.mixer.Sound("399303__deleted-user-5405837__explosion-012.ogg"))
+            pymixer.play(pygame.mixer.Sound("399303__deleted-user-5405837__explosion-012.ogg"))
     visualize(terrainMap, objectMap)
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()
