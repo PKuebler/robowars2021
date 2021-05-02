@@ -281,6 +281,8 @@ def startGame():
     moveMode = True
     orders = []
 
+    hoverTile = None
+
 
     print("starte Gameloop")
     # GameLoop
@@ -297,14 +299,14 @@ def startGame():
 
                 if tile != None:
                     hoverTile = tile
-                    print(("hit", tile.x, tile.y))
+                    #print(("hit", tile.x, tile.y))
                 else:
                     hoverTile = None
 
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                  playerOneRobot, playerTwoRobot, terrainMap,
-                                                                 objectMap)
+                                                                 objectMap, hoverTile)
             # wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
                 if twoLocalPlayers:

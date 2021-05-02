@@ -26,13 +26,13 @@ def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
     if target_x >= 0 and target_x < SIZE and target_y >= 0 and target_y < SIZE:
         playerRobot.setTarget(target_x, target_y)
 
-def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap):
+def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerTwoRobot, terrainMap, objectMap, hoverTile):
     order = None
     #Mausklick auswerten
     if event.type == pygame.QUIT:
         sys.exit()
     elif event.type == pygame.MOUSEBUTTONUP:
-        pass
+        print(hoverTile.x, hoverTile.y)
     #Tastatur auswerten
     elif event.type == pygame.KEYUP:
         #ist der Spieler am Zug?
