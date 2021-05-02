@@ -13,7 +13,16 @@ def returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot):
             return playerTwoRobot
     return None
 
+def isMoveValid(playerTurn, moveMode, hoverTile, playerRobot, objectMap):
+    if not moveMode or not playerTurn or hoverTile == None or playerRobot == None:
+        return False
+    moveDist = abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y)
+    if moveDist > 0 and moveDist <= playerRobot.steps and objectMap[hoverTile.x][hoverTile.y] == None:
+        return True
+    return False
+
 def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
+    #Für Tastatursteuerung
     order = None
     #noch schritte?
     if playerRobot.steps > 0:
@@ -28,6 +37,7 @@ def move(playerRobot, offset_x, offset_y, terrainMap, objectMap):
     return order
 
 def changeAim(playerRobot, offset_x, offset_y, terrainMap, objectMap):
+    #Für Tastatursteuerung
     target_x = playerRobot.shootAtX + offset_x
     target_y = playerRobot.shootAtY + offset_y
     #feld auf Spielfeld?
@@ -44,13 +54,16 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     #spielfigur und cursor festlegen
     if playerTurn:
         playerRobot = returnActivePlayer(playerTurn, playerOne, playerOneRobot, playerTwoRobot)
-        if moveMode and hoverTile != None:
+        """if moveMode and hoverTile != None:
             moveDist = abs(hoverTile.x - playerRobot.x) + abs(hoverTile.y - playerRobot.y)
             if moveDist > 0 and moveDist <= playerRobot.steps and objectMap[hoverTile.x][hoverTile.y] == None:
                 withinWalkingDistance = True
                 pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
             else:
-                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
+                pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)"""
+        if isMoveValid(playerTurn, moveMode, hoverTile, playerRobot, objectMap):
+            withinWalkingDistance = True
+            pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
         else:
             pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
     else:
@@ -61,7 +74,7 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     if event.type == pygame.MOUSEBUTTONUP:
         if hoverTile != None:
             print(hoverTile.x, hoverTile.y)
-            if moveMode:
+            if moveMode and withinWalkingDistance:
                 order = playerRobot.mouseMove(hoverTile.x, hoverTile.y, objectMap)
                 print(order)
         #print(bu.key)
@@ -121,10 +134,8 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     return playerTurn, moveMode, order
 
 def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot):
-    print("execute")
+    print("execute:")
     print(orders)
-
-    #pygame.mixer.init()
 
     #beide Spieler gehen aufs gleiche feld
     if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"]:
@@ -135,7 +146,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
         playerTwoRobot.initNewRound()
         return
 
-
+    #Bewegungsbefehle zuerst
     for order in orders:
         #roboter wählen
         if order["player_nr"] == 1:
@@ -151,6 +162,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             #bewegung ausführen über objekt
             playerRobot.executeMove(terrainMap, objectMap, order["x"], order["y"])
 
+    #dann Beschuss
     for order in orders:
         #roboter wählen
         if order["player_nr"] == 1:
@@ -167,7 +179,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
             print("action_2")
             playerRobot.action_2(order["x"], order["y"], terrainMap, objectMap)
             pygame.mixer.Channel(3).play(pygame.mixer.Sound("399303__deleted-user-5405837__explosion-012.wav"))
-    visualize(terrainMap, objectMap)
+    #Steps zurücksetzen
     playerOneRobot.initNewRound()
     playerTwoRobot.initNewRound()
 
