@@ -226,7 +226,7 @@ def startGame():
     moveMode = True
     orders = []
     hoverTile = None
-    playerOne = player.Player("Philipp", "1234")
+    playerOne = player.Player("Lars", "1234")
 
     print("starte GUI-Credential Loop")
     while True:
@@ -248,7 +248,7 @@ def startGame():
     print("starte Gameloop")
 
     # Host oder nicht?
-    host = False  # ÄNDERN FÜR SPIELER 2 (False)
+    host = True  # ÄNDERN FÜR SPIELER 2 (False)
     playerOneTurn = True
     twoLocalPlayers = False  # ÄNDERN FÜR ONLINE (False)
     twoLocalPlayersPlayerOne = True
@@ -293,7 +293,6 @@ def startGame():
                         terrainMap = initializeGame.createMapWithObjFromJson(jsonTerrMap, MAPSIZE)[0]
                         objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(
                             jsonObjMap, MAPSIZE)
-                        print(objectMap)
                         print("Karten und GameStartedEvt empfangen")
                         waitingForPlayerOne = False
                     else:
