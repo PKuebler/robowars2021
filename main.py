@@ -90,7 +90,7 @@ def tileOnPos(screenX, screenY, tileMap):
     return tile
 
 # rendert den Hintergrund
-def renderBackground(terrainMap, hoverTile):
+def renderBackground(terrainMap, hoverTile, playerRobot):
     night = 16, 17, 18
     screenSurfcace.fill(night)
 
@@ -383,7 +383,7 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        renderBackground(terrainMap, hoverTile)
+        renderBackground(terrainMap, hoverTile, playerRobot)
         renderGameObjects(objectMap)
         renderGUI()
         pygame.display.flip()
