@@ -177,14 +177,14 @@ def guiInitialisation():
                                                  manager=ui_manager)
 
 
-def checkForGuiEvents(event, playerOne, nameIsSet):
+def checkForGuiEvents(event, playerOne):
     if event.type == pygame.USEREVENT:
         if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == connectButton:
                 playerOne.name = loginTextBox.get_text()
                 playerOne.sessionID = sessionIDTextBox.get_text()
-                print(playerOne.name, playerOne.sessionID)
-                nameIsSet = True
+                return True
+    return False
 
 
 def startGame():
@@ -225,18 +225,25 @@ def startGame():
     playerTurn = True
     moveMode = True
     orders = []
-    nameIsSet = False
     hoverTile = None
     playerOne = player.Player("Philipp", "1234")
 
     print("starte GUI-Credential Loop")
-    # while nameIsSet == False:
-    #     time_delta = clock.tick(60) / 1000.0
-    #     for event in pygame.event.get():
-    #         checkForGuiEvents(event, playerOne, nameIsSet)
-    #         ui_manager.process_events(event)
-    #     renderGUI(time_delta)
-    #     pygame.display.flip()
+    while True:
+        time_delta = clock.tick(60) / 1000.0
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            flag = checkForGuiEvents(event, playerOne)
+            if flag:
+                break
+            ui_manager.process_events(event)
+        renderGUI(time_delta)
+        pygame.display.flip()
+        if flag:
+            break
+
 
     print("starte Gameloop")
 
