@@ -88,7 +88,7 @@ def tileOnPos(screenX, screenY, tileMap):
 
 # rendert den Hintergrund
 def renderBackground(terrainMap, hoverTile):
-    night = 0, 0, 76
+    night = 16, 17, 18
     screenSurfcace.fill(night)
 
     if terrainMap == None:
