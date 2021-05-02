@@ -99,10 +99,11 @@ func (r *Room) finishRound() {
 	events := []CommandEvt{}
 	for client, cmd := range cmds {
 		events = append(events, CommandEvt{
-			Player:  client.Name(),
-			Type:    cmd.Type,
-			TargetX: cmd.TargetX,
-			TargetY: cmd.TargetY,
+			Player:   client.Name(),
+			Type:     cmd.Type,
+			TargetX:  cmd.TargetX,
+			TargetY:  cmd.TargetY,
+			PlayerNr: cmd.PlayerNr,
 		})
 	}
 
