@@ -7,6 +7,8 @@ import objects
 import gameLogic
 import random
 import math
+
+import player
 from client import *
 import time
 
@@ -157,50 +159,32 @@ def guiInitialisation():
     clock = pygame.time.Clock()
     clock.tick(30)  # FPS Cap
 
-    global playerName
-    playerName = ""
-    global playerPassword
-    playerPassword = ""
+    global playersessionID
+    playersessionID = ""
 
-    global playerNameLabel
-    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
-                                                    html_text=str("Enter your name"),
-                                                    manager=ui_manager)
     global loginTextBox
-    loginTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((0, 110),
-                                                                   (400, 200)), ui_manager)
-    global loginButton
-    loginButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((0, 160), (400, 50)),
-                                               text='Confirm Name',
-                                               manager=ui_manager)
+    loginTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((screenSurfcace.get_width() / 2 - 200, 200),
+                                                                   (400, 50)), ui_manager)
+    loginTextBox.set_text("Enter your name")
+
+    global sessionIDTextBox
+    sessionIDTextBox = pygame_gui.elements.UITextEntryLine(pygame.Rect((screenSurfcace.get_width()/2-200, 260),
+                                                                   (400, 50)), ui_manager)
+    sessionIDTextBox.set_text("Enter your Session ID")
+    global connectButton
+    connectButton = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((screenSurfcace.get_width() / 2 - 200, 320), (400, 50)),
+                                                 text='Conect to Server',
+                                                 manager=ui_manager)
 
 
-def checkForGuiEvents(event):
+def checkForGuiEvents(event, playerOne):
     if event.type == pygame.USEREVENT:
         if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == loginButton:
-                global playerName
-                global playerPassword
-                if playerName == "":
-                    playerName = loginTextBox.get_text()
-                    loginTextBox.set_text("")
-                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
-                                                                    html_text="Your Name is: " + str(
-                                                                        playerName) + ". Password please!",
-                                                                    manager=ui_manager)
-                elif playerName != "" and playerPassword == "":
-                    playerPassword = loginTextBox.get_text()
-                    loginButton.set_text("Confirm Password")
-                    playerNameLabel = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 0), (400, 100)),
-                                                                    html_text="Your Name is: " + str(
-                                                                        playerName) + ", Your Password is: " + str(
-                                                                        playerPassword),
-                                                                    manager=ui_manager)
-                    loginTextBox.set_text("Thank You.")
-                    loginButton.set_text("Connect!")
-                elif playerName != "" and playerPassword != "":
-                    print("Connect to Server")
-                    # print(playerName)
+            if event.ui_element == connectButton:
+                playerOne.name = loginTextBox.get_text()
+                playerOne.sessionID = sessionIDTextBox.get_text()
+                print(playerOne.name, playerOne.sessionID)
+                nameIsSet = True
 
 
 def startGame():
@@ -237,20 +221,30 @@ def startGame():
     playerOneRobot, playerTwoRobot: Die Objekte mit den beiden Spieler-Robotern; eine "KI" könnte noch eine Liste der feind-roboter bekommen
     """
 
-    #für Server
-    playerName = "Lars"         #ÄNDERN FÜR SPIELER 2
-    sessionId = "12345"
+    # Variablen zum Start
+    playerTurn = True
+    moveMode = True
+    orders = []
+    nameIsSet = False
+    hoverTile = None
+    playerOne = player.Player("TestName", "1234")
+
+    print("starte GUI-Credential Loop")
+    while nameIsSet:
+        pass
+
+    print("starte Gameloop")
 
     # Host oder nicht?
-    host = False                 #ÄNDERN FÜR SPIELER 2 (False)
+    host = False  # ÄNDERN FÜR SPIELER 2 (False)
     playerOneTurn = True
-    twoLocalPlayers = True     #ÄNDERN FÜR ONLINE (False)
+    twoLocalPlayers = False  # ÄNDERN FÜR ONLINE (False)
     twoLocalPlayersPlayerOne = True
     # online?
     if not twoLocalPlayers:
         sv = Client("pkuebler.de", 3210)
-        sv.connect(playerName)
-        sv.join(sessionId)
+        sv.connect(playerOne.name)
+        sv.join(playerOne.sessionID)
         # wenn host: karte generieren
         if host:
             terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
@@ -264,7 +258,7 @@ def startGame():
                 data = sv.read()
                 if data != None:
                     if "type" in data and data["type"] == "PlayerConnectEvt":
-                        if data["payload"]["name"] != playerName:
+                        if data["payload"]["name"] != playerOne.name:
                             print(data["payload"]["name"] + " joined")
                             sv.startGame(jsonTerrMap, jsonObjMap, 60)
                             print("StartGameCmd gesendet")
@@ -285,7 +279,8 @@ def startGame():
                         jsonTerrMap = data["payload"]["terrain"]
                         jsonObjMap = data["payload"]["map"]
                         terrainMap = initializeGame.createMapWithObjFromJson(jsonTerrMap, MAPSIZE)
-                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(jsonObjMap, MAPSIZE)
+                        objectMap, playerOneRobot, playerTwoRobot = initializeGame.createMapWithObjFromJson(
+                            jsonObjMap, MAPSIZE)
                         print(objectMap)
                         print("Karten und GameStartedEvt empfangen")
                         waitingForPlayerOne = False
@@ -296,18 +291,10 @@ def startGame():
     # offline
     else:
         terrainMap, objectMap, playerOneRobot, playerTwoRobot = initializeGame.initGame(MAPSIZE)
-
-    # Variablen zum Start
-    playerTurn = True
-    moveMode = True
-    orders = []
-
-    hoverTile = None
-
-
-    print("starte Gameloop")
     # GameLoop
     while True:
+
+
         global time_delta
         time_delta = clock.tick(60) / 1000.0
 
@@ -315,7 +302,7 @@ def startGame():
         playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot)
         #events abarbeiten
         for event in pygame.event.get():
-            checkForGuiEvents(event)
+            checkForGuiEvents(event, playerOne)
             ui_manager.process_events(event)
             #tile unter der Maus
             if event.type == MOUSEMOTION:
@@ -361,7 +348,7 @@ def startGame():
                 if data != None:
                     if "type" in data and data["type"] == "RoundEndEvt":
                         for o in data["payload"]["commands"]:
-                            if o["player"] != playerName:
+                            if o["player"] != playerOne.name:
                                 ##order = o
                                 orders.append(o)
                                 receivedOrders = True
