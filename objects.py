@@ -43,14 +43,16 @@ class Object:
             self.shootAtX = self.x
             self.shootAtY = self.y
 
-        def changeHealth(self, damage):
+        def changeHealth(self, damage, terrainMap, objectMap):
             self.health -= damage
             print("my health: " + str(self.health))
             if self.health <= 0:
-                self.onDeath()
+                self.onDeath(terrainMap, objectMap)
 
-        def onDeath(self):
+        def onDeath(self, terrainMap, objectMap):
             print("aaaargh")
+            if self.obtype == "wall":
+                objectMap[self.x][self.y] = None
 
         def setTarget(self, shootAtX, shootAtY):
             self.shootAtX = shootAtX
@@ -61,8 +63,8 @@ class Object:
             #basic shooting attack
             BASE_DMG = 3
             if objectMap[targetX][targetY] != None:
-                objectMap[targetX][targetY].changeHealth(BASE_DMG)
                 print("treffer bei " + objectMap[targetX][targetY].name)
+                objectMap[targetX][targetY].changeHealth(BASE_DMG, terrainMap, objectMap)
 
         def action_2(self, targetX, targetY, terrainMap, objectMap):
             #aoe shooting attack
@@ -71,8 +73,8 @@ class Object:
                 for y in range(-1,2):
                     if targetX+x >= 0 and targetY+y >= 0 and targetX+x < 10 and targetY+y < 10:
                         if objectMap[targetX+x][targetY+y] != None:
-                            objectMap[targetX+x][targetY+y].changeHealth(BASE_DMG)
                             print("treffer bei " + objectMap[targetX+x][targetY+y].name)
+                            objectMap[targetX+x][targetY+y].changeHealth(BASE_DMG, terrainMap, objectMap)
 
         def melee(self, targetX, targetY, terrainMap, objectMap):
             pass

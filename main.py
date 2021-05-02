@@ -226,7 +226,7 @@ def startGame():
     moveMode = True
     orders = []
     hoverTile = None
-    playerOne = player.Player("TestName", "1234")
+    playerOne = player.Player("Lars", "1234")
 
     print("starte GUI-Credential Loop")
     while True:
@@ -308,7 +308,7 @@ def startGame():
         time_delta = clock.tick(60) / 1000.0
 
         #aktiver Roboter
-        playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot)
+        playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot, host, twoLocalPlayers)
         #events abarbeiten
         for event in pygame.event.get():
             #tile unter der Maus
@@ -323,7 +323,7 @@ def startGame():
             # Aktion auswerten
             playerTurn, moveMode, order = gameLogic.handleEvents(event, playerTurn, moveMode, twoLocalPlayersPlayerOne,
                                                                  playerOneRobot, playerTwoRobot, terrainMap,
-                                                                 objectMap, hoverTile)
+                                                                 objectMap, hoverTile, host)
             # wenn korrektes event wurde befehl erzeugt: spielzug endet
             if order != None:
                 if twoLocalPlayers:
