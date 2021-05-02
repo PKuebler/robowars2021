@@ -141,8 +141,8 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
 
     #beide Spieler gehen aufs gleiche feld
     if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"] and orders[0]["ordertype"] == "move" and orders[1]["ordertype"] == "move":
-        playerOneRobot.changeHealth(2)
-        playerTwoRobot.changeHealth(2)
+        playerOneRobot.changeHealth(2, terrainMap, objectMap)
+        playerTwoRobot.changeHealth(2, terrainMap, objectMap)
         #beenden, da kollision
         playerOneRobot.initNewRound()
         playerTwoRobot.initNewRound()
