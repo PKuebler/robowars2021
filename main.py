@@ -303,17 +303,19 @@ def startGame():
     while True:
         global time_delta
         time_delta = clock.tick(60) / 1000.0
+
+        #aktiver Roboter
+        playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot)
+        #events abarbeiten
         for event in pygame.event.get():
             checkForGuiEvents(event)
             ui_manager.process_events(event)
-
-
+            #tile unter der Maus
             if event.type == MOUSEMOTION:
                 tile = tileOnPos(event.pos[0], event.pos[1], terrainMap)
-
                 if tile != None:
                     hoverTile = tile
-                    print(("hit", tile.x, tile.y))
+                    #print(("hit", tile.x, tile.y))
                 else:
                     hoverTile = None
 
