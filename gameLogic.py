@@ -61,10 +61,11 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
                 pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
             else:
                 pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)"""
-        if isMoveValid(playerTurn, moveMode, hoverTile, playerRobot, objectMap):
+        #bewegungscursor und walkingDistance
+        if moveMode and isMoveValid(playerTurn, moveMode, hoverTile, playerRobot, objectMap):
             withinWalkingDistance = True
             pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_ARROW)
-        else:
+        elif moveMode:
             pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
     else:
         pygame.mouse.set_system_cursor(pygame.SYSTEM_CURSOR_NO)
@@ -73,10 +74,11 @@ def handleEvents(event, playerTurn, moveMode, playerOne, playerOneRobot, playerT
     #Maussteuerung
     if event.type == pygame.MOUSEBUTTONUP:
         if hoverTile != None:
-            print(hoverTile.x, hoverTile.y)
             if moveMode and withinWalkingDistance:
                 order = playerRobot.mouseMove(hoverTile.x, hoverTile.y, objectMap)
                 print(order)
+            else:
+                order = {"ordertype": "action_1", "x": hoverTile.x, "y": hoverTile.y, "player_nr": playerRobot.player}
         #print(bu.key)
 
     #Tastatur auswerten
@@ -138,7 +140,7 @@ def executeOrders(orders, terrainMap, objectMap, playerOneRobot, playerTwoRobot)
     print(orders)
 
     #beide Spieler gehen aufs gleiche feld
-    if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"]:
+    if orders[0]["x"] == orders[1]["x"] and orders[0]["y"] == orders[1]["y"] and orders[0]["ordertype"] == "move" and orders[1]["ordertype"] == "move":
         playerOneRobot.changeHealth(2)
         playerTwoRobot.changeHealth(2)
         #beenden, da kollision
