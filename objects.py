@@ -8,6 +8,7 @@ class Object:
             self.name = name
             self.obtype = obtype
             self.health = health
+            self.maxhealth = health
             self.x = x
             self.y = y
             self.player = player
