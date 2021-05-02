@@ -35,7 +35,7 @@ def graphicsInitialisation():
             map_data[i][j].setImage("test80.png")
 
     # ladet die bildaten
-    global wall, robot1, robot2, grass, ice, underGround, hoverGround, healthbar, healthstatus
+    global wall, robot1, robot2, grass, ice, underGround, hoverGround, healthbar, healthstatus, selectedCursor
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('test8060.png').convert_alpha()
     wall = pygame.image.load('test80Object.png').convert_alpha()
@@ -45,6 +45,7 @@ def graphicsInitialisation():
     hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
     healthbar = pygame.image.load('healthbar.png').convert_alpha()
     healthstatus = pygame.image.load('healthstatus.png').convert_alpha()
+    selectedCursor = pygame.image.load('test80Cursor.png').convert_alpha()
 
 TILE_WIDTH = 80 # 128
 TILE_HEIGHT = 40 # 64
@@ -104,6 +105,10 @@ def renderBackground(terrainMap, hoverTile):
     if hoverTile != None:
         screen = mapToScreen(hoverTile.x, hoverTile.y)
         screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
+    
+    if playerRobot != None:
+        screen = mapToScreen(playerRobot.x, playerRobot.y)
+        screenSurfcace.blit(selectedCursor, (screen[0], screen[1]))
 
 # renders GameObjects
 def renderGameObjects(objectMap):
