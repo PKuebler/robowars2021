@@ -38,7 +38,7 @@ def graphicsInitialisation():
     global wall, robot, grass, ice, underGround, hoverGround
     ice = pygame.image.load('ice.png').convert_alpha()  # load images
     grass = pygame.image.load('test8060.png').convert_alpha()
-    wall = pygame.image.load('house1.png').convert_alpha()
+    wall = pygame.image.load('test80Object.png').convert_alpha()
     robot = pygame.image.load('robot1.png').convert_alpha()
     underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
     hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
@@ -119,7 +119,7 @@ def renderGameObjects(objectMap):
             elif tile.obtype == "wall":
                 image = wall
 
-            screenSurfcace.blit(image, (iso[0], iso[1]))  # display the actual tile
+            screenSurfcace.blit(image, (iso[0], iso[1]-10))  # display the actual tile
 
     pass
 
