@@ -11,6 +11,8 @@ import math
 import player
 from client import *
 import time
+import renderer
+import assets
 
 MAPSIZE = 10
 
@@ -35,6 +37,23 @@ def graphicsInitialisation():
         for j, tile in enumerate(row):
             map_data[i][j] = objects.Object("grass", "terrain", 10, i, j)  # füttert die map mit terraintypen
             map_data[i][j].setImage("test80.png")
+
+    global mapRenderer, assetManager
+
+    assetManager = assets.AssetManager()
+    assetManager.addImage("grass", "test8060.png")
+    assetManager.addImage("water", "test8060water.png")
+    assetManager.addImage("wall", "test80Object.png")
+    assetManager.addImage("robot1", "test80robot1.png")
+    assetManager.addImage("robot2", "test80robot2.png")
+    assetManager.addImage("hoverGround", "test80Hover.png")
+    assetManager.addImage("healthbar", "healthbar.png")
+    assetManager.addImage("healthstatus", "healthstatus.png")
+    assetManager.addImage("selectedCursor", "test80Cursor.png")
+    assetManager.load()
+
+    backgroundColor = 16, 17, 18
+    mapRenderer = renderer.Renderer(assetManager, backgroundColor)
 
     # ladet die bildaten
     global wall, robot1, robot2, grass, water, ice, underGround, hoverGround, healthbar, healthstatus, selectedCursor
@@ -250,7 +269,7 @@ def startGame():
     # Host oder nicht?
     host = False  # ÄNDERN FÜR SPIELER 2 (False)
     playerOneTurn = True
-    twoLocalPlayers = False  # ÄNDERN FÜR ONLINE (False)
+    twoLocalPlayers = True  # ÄNDERN FÜR ONLINE (False)
     twoLocalPlayersPlayerOne = True
     # online?
     if not twoLocalPlayers:
@@ -309,15 +328,18 @@ def startGame():
 
         #aktiver Roboter
         playerRobot = gameLogic.returnActivePlayer(playerTurn, twoLocalPlayersPlayerOne, playerOneRobot, playerTwoRobot, host, twoLocalPlayers)
+        mapRenderer.setCurrentRobot(playerRobot)
         #events abarbeiten
         for event in pygame.event.get():
             #tile unter der Maus
             if event.type == MOUSEMOTION:
                 tile = tileOnPos(event.pos[0], event.pos[1], terrainMap)
                 if tile != None:
+                    mapRenderer.setCurrentHover(tile)
                     hoverTile = tile
                     #print(("hit", tile.x, tile.y))
                 else:
+                    mapRenderer.setCurrentHover(None)
                     hoverTile = None
 
             # Aktion auswerten
@@ -386,6 +408,7 @@ def startGame():
 
         renderBackground(terrainMap, hoverTile, playerRobot)
         renderGameObjects(objectMap)
+        mapRenderer.draw(screenSurfcace, terrainMap, objectMap)
         pygame.display.flip()
 
 
