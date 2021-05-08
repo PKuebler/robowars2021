@@ -15,11 +15,18 @@ class Renderer:
         self.currentRobot = None
         self.currentHover = None
 
-    def draw(self, screenSurfcace, tileObjects, mapObjects):
+        # blink animation counter
+        self.blinkAnimationCounter = 0
+
+    def draw(self, screenSurfcace, time_delta, tileObjects, mapObjects):
         screenSurfcace.fill(self.background)
 
         self.cameraX = screenSurfcace.get_rect().width / 2
         self.cameraY = 64 #screenSurfcace.get_rect().height / 4 + 64
+
+        self.blinkAnimationCounter += time_delta
+        if self.blinkAnimationCounter > 10:
+            self.blinkAnimationCounter = 0
 
         self.__drawGroundTiles(screenSurfcace, tileObjects)
         self.__drawMapObjects(screenSurfcace, mapObjects)
@@ -49,7 +56,7 @@ class Renderer:
             screen = self.mapToScreen(self.currentHover.x, self.currentHover.y)
             screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
 
-        if self.currentRobot != None:
+        if self.currentRobot != None and self.blinkAnimationCounter % 2 < 1:
             selectedCursor = self.assets.getImage("selectedCursor")
             screen = self.mapToScreen(self.currentRobot.x, self.currentRobot.y)
             screenSurfcace.blit(selectedCursor, (screen[0], screen[1]))

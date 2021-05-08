@@ -286,7 +286,7 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        mapRenderer.draw(screenSurfcace, terrainMap, objectMap)
+        mapRenderer.draw(screenSurfcace, time_delta, terrainMap, objectMap)
         pygame.display.flip()
 
 
