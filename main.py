@@ -33,15 +33,15 @@ def graphicsInitialisation():
     global mapRenderer, assetManager
 
     assetManager = assets.AssetManager()
-    assetManager.addImage("grass", "test8060.png")
-    assetManager.addImage("water", "test8060water.png")
-    assetManager.addImage("wall", "test80Object.png")
-    assetManager.addImage("robot1", "test80robot1.png")
-    assetManager.addImage("robot2", "test80robot2.png")
-    assetManager.addImage("hoverGround", "test80Hover.png")
-    assetManager.addImage("healthbar", "healthbar.png")
-    assetManager.addImage("healthstatus", "healthstatus.png")
-    assetManager.addImage("selectedCursor", "test80Cursor.png")
+    assetManager.addImage("grass", "assets/images/test8060.png")
+    assetManager.addImage("water", "assets/images/test8060water.png")
+    assetManager.addImage("wall", "assets/images/test80Object.png")
+    assetManager.addImage("robot1", "assets/images/test80robot1.png")
+    assetManager.addImage("robot2", "assets/images/test80robot2.png")
+    assetManager.addImage("hoverGround", "assets/images/test80Hover.png")
+    assetManager.addImage("healthbar", "assets/images/healthbar.png")
+    assetManager.addImage("healthstatus", "assets/images/healthstatus.png")
+    assetManager.addImage("selectedCursor", "assets/images/test80Cursor.png")
     assetManager.load()
 
     backgroundColor = 16, 17, 18
