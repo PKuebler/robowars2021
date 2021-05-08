@@ -30,14 +30,6 @@ def gameWindowInitialisation():
 
 # GraphicFiles Initialisierung
 def graphicsInitialisation():
-    # initialisiert das gamemap array
-    global map_data
-    map_data = [[[] for i in range(10)] for j in range(10)]
-    for i, row in enumerate(map_data):
-        for j, tile in enumerate(row):
-            map_data[i][j] = objects.Object("grass", "terrain", 10, i, j)  # füttert die map mit terraintypen
-            map_data[i][j].setImage("test80.png")
-
     global mapRenderer, assetManager
 
     assetManager = assets.AssetManager()
@@ -55,48 +47,8 @@ def graphicsInitialisation():
     backgroundColor = 16, 17, 18
     mapRenderer = renderer.Renderer(assetManager, backgroundColor)
 
-    # ladet die bildaten
-    global wall, robot1, robot2, grass, water, ice, underGround, hoverGround, healthbar, healthstatus, selectedCursor
-    ice = pygame.image.load('ice.png').convert_alpha()  # load images
-    grass = pygame.image.load('test8060.png').convert_alpha()
-    water = pygame.image.load('test8060water.png').convert_alpha()
-    wall = pygame.image.load('test80Object.png').convert_alpha()
-    robot1 = pygame.image.load('test80robot1.png').convert_alpha()
-    robot2 = pygame.image.load('test80robot2.png').convert_alpha()
-    underGround = pygame.image.load('underGroundBackGround.png').convert_alpha()
-    hoverGround = pygame.image.load('test80Hover.png').convert_alpha()
-    healthbar = pygame.image.load('healthbar.png').convert_alpha()
-    healthstatus = pygame.image.load('healthstatus.png').convert_alpha()
-    selectedCursor = pygame.image.load('test80Cursor.png').convert_alpha()
-
-TILE_WIDTH = 80 # 128
-TILE_HEIGHT = 40 # 64
-TILE_WIDTH_HALF = TILE_WIDTH / 2
-TILE_HEIGHT_HALF = TILE_HEIGHT / 1.333
-
-def mapToScreen(mapX, mapY):
-    CAMERA_X = screenSurfcace.get_rect().width / 2
-    CAMERA_Y = 64 #screenSurfcace.get_rect().height / 4 + 64
-
-    screenX = (mapX - mapY) * TILE_WIDTH_HALF + CAMERA_X
-    screenY = (mapX + mapY) * TILE_HEIGHT_HALF + CAMERA_Y
-
-    return (screenX, screenY)
-
-def screenToMap(screenX, screenY):
-    CAMERA_X = screenSurfcace.get_rect().width / 2
-    CAMERA_Y = 64 #screenSurfcace.get_rect().height / 4 + 64
-
-    screenX = screenX - CAMERA_X
-    screenY = screenY - CAMERA_Y
-
-    mapX = (screenX / TILE_WIDTH_HALF + screenY / TILE_HEIGHT_HALF) / 2
-    mapY = (screenY / TILE_HEIGHT_HALF - (screenX / TILE_WIDTH_HALF)) / 2
-
-    return (mapX, mapY)
-
 def tileOnPos(screenX, screenY, tileMap):
-    mapPos = screenToMap(screenX, screenY)
+    mapPos = mapRenderer.screenToMap(screenX, screenY)
 
     mapX = round(mapPos[0])-1
     mapY = round(mapPos[1])
@@ -111,65 +63,9 @@ def tileOnPos(screenX, screenY, tileMap):
 
     return tile
 
-# rendert den Hintergrund
-def renderBackground(terrainMap, hoverTile, playerRobot):
-    night = 16, 17, 18
-    screenSurfcace.fill(night)
-
-    if terrainMap == None:
-        return
-
-    for row_i, row_item in enumerate(terrainMap):  # for every row_item of the map. row_i = index of loop
-        for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
-            iso = mapToScreen(row_i, col_i)
-
-            if tile.obtype == "water":
-                image = water
-            else:
-                image = grass
-
-            screenSurfcace.blit(image, (iso[0], iso[1]))  # display the actual tile
-
-    if hoverTile != None:
-        screen = mapToScreen(hoverTile.x, hoverTile.y)
-        screenSurfcace.blit(hoverGround, (screen[0], screen[1]))
-
-    if playerRobot != None:
-        screen = mapToScreen(playerRobot.x, playerRobot.y)
-        screenSurfcace.blit(selectedCursor, (screen[0], screen[1]))
-
-# renders GameObjects
-def renderGameObjects(objectMap):
-    if objectMap == None:
-        return
-
-    for row_i, row_item in enumerate(objectMap):  # for every row_item of the map. row_i = index of loop
-        for col_i, tile in enumerate(row_item): # for every tileObject on the map col_i = index of loop
-            if tile == None:
-                continue
-
-            iso = mapToScreen(tile.x, tile.y)
-
-            if tile.obtype == "robot1":
-                image = robot1
-            if tile.obtype == "robot1":
-                image = robot2
-            elif tile.obtype == "wall":
-                image = wall
-
-            screenSurfcace.blit(image, (iso[0], iso[1]-10))  # display the actual tile
-
-            if tile.health != tile.maxhealth:
-                screenSurfcace.blit(healthbar, (iso[0]+15, iso[1]-10))
-                for i in range(tile.health):
-                    screenSurfcace.blit(healthstatus, (iso[0]+15+3+i*9, iso[1]-10+3))
-    pass
-
-
 def renderGUI(time_delta):
     ui_manager.update(time_delta)
     ui_manager.draw_ui(screenSurfcace)
-
 
 def guiInitialisation():
     global ui_manager
@@ -213,21 +109,6 @@ def startGame():
     soundMusic = pygame.mixer.Sound('mechanoid.wav')
     soundMusic.play(-1)
     soundMusic.set_volume(0.3)
-
-    roboto1 = pygame.image.load('robot1.png')
-    roboto1_mask = pygame.mask.from_surface(roboto1, 50)
-
-    roboto1.convert()
-    rect = roboto1.get_rect()
-    rect.center = roboto1.get_width() / 2, roboto1.get_height() / 2
-
-    roboto2 = pygame.image.load('robot2.png')
-    roboto2_mask = pygame.mask.from_surface(roboto2, 50)
-    roboto2.convert()
-    rect = roboto2.get_rect()
-    rect.center = roboto2.get_width() / 2, roboto2.get_height() / 2
-
-    hoverTile = None
 
     """variablen:
     host: True für Spieler1, der die Karte erstellt, wenn Spieler2, der über den Server joint False
@@ -406,8 +287,6 @@ def startGame():
                 playerTurn = True
                 orders = []
 
-        renderBackground(terrainMap, hoverTile, playerRobot)
-        renderGameObjects(objectMap)
         mapRenderer.draw(screenSurfcace, terrainMap, objectMap)
         pygame.display.flip()
 

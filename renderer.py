@@ -104,6 +104,8 @@ class Renderer:
         mapX = (screenX / self.tileWidthHalf + screenY / self.tileHeightHalf) / 2
         mapY = (screenY / self.tileHeightHalf - (screenX / self.tileWidthHalf)) / 2
 
+        return (mapX, mapY)
+
     def setCurrentRobot(self, gameObject):
         self.currentRobot = gameObject
     
